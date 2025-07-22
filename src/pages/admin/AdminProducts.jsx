@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
-import ProductForm from '../components/admin/ProductForm';
+import ProductForm from '../../components/admin/ProductForm';
 
 const AdminProducts = () => {
   const { products, categories, deleteProduct } = useData();

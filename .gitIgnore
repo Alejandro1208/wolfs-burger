@@ -1,0 +1,24 @@
+# Dependencias
+# Esta carpeta contiene todos los paquetes descargados y no debe subirse.
+/node_modules
+
+# Archivos de compilación
+/dist
+
+# Logs de errores
+npm-debug.log*
+yarn-error.log
+yarn-debug.log*
+pnpm-debug.log*
+
+# Archivos de entorno
+.env.local
+.env.*.local
+
+# Archivos de configuración de editores
+.vscode/
+.idea/
+
+# Archivos específicos del sistema operativo
+.DS_Store
+Thumbs.db
