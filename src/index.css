@@ -14,3 +14,29 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+@layer components {
+  .btn-solid-red {
+    @apply inline-block bg-primary text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg border-2 border-primary hover:bg-transparent hover:text-white;
+  }
+  .btn-outline-white {
+    @apply inline-block bg-white text-primary font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg border-2 border-white hover:bg-transparent hover:text-white;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
