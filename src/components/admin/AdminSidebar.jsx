@@ -9,6 +9,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import logo from '../../assets/logo.png'; // Importamos el logo
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -27,15 +28,16 @@ const AdminSidebar = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-white w-64 min-h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
-        <div className="text-xl font-bold">
-          🍔 Admin Panel
-        </div>
+    // CAMBIO: Fondo rojo (bg-primary) y texto claro
+    <div className="bg-primary text-white w-64 min-h-screen flex flex-col">
+      {/* CAMBIO: Logo en la parte superior */}
+      <div className="p-6 border-b border-white/20 flex justify-center">
+        <Link to="/admin">
+          <img src={logo} alt="Wolf's Burger Logo" className="h-20 w-auto" />
+        </Link>
       </div>
 
-      {/* Navigation */}
+      {/* Navegación */}
       <nav className="flex-1 px-4 py-6 space-y-2">
         {navigation.map((item) => {
           const Icon = item.icon;
@@ -47,8 +49,8 @@ const AdminSidebar = () => {
               to={item.href}
               className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
                 isActive
-                  ? 'bg-primary-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-white/90 text-primary' // Estilo para el enlace activo
+                  : 'text-white hover:bg-white/20' // Estilo para enlaces inactivos
               }`}
             >
               <Icon className="mr-3 h-5 w-5" />
@@ -59,10 +61,10 @@ const AdminSidebar = () => {
       </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 border-t border-white/20">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors duration-200"
+          className="flex items-center w-full px-4 py-3 text-sm font-medium text-white rounded-lg hover:bg-white/20 transition-colors duration-200"
         >
           <LogOut className="mr-3 h-5 w-5" />
           Cerrar Sesión

@@ -1,6 +1,9 @@
+// src/pages/admin/AdminLogin.jsx (VERSIÓN FINAL CON NUEVO DISEÑO)
+
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import logo from '../../assets/logo.png'; // Importamos el logo
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -28,17 +31,18 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    // Fondo rojo y centrado
+    <div className="min-h-screen bg-primary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <div className="text-4xl font-bold text-gradient mb-4">
-            🍔 Burger House
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          {/* Logo del sitio */}
+          <img src={logo} alt="Wolf's Burger Logo" className="mx-auto h-24 w-auto" />
+          {/* Título actualizado */}
+          <h2 className="mt-6 text-3xl font-bold text-white">
             Panel de Administración
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Ingresa tus credenciales para acceder
+          <p className="mt-2 text-lg text-brand-cream">
+            Wolf's Burger
           </p>
         </div>
       </div>
@@ -47,7 +51,7 @@ const AdminLogin = () => {
         <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md text-sm">
                 {error}
               </div>
             )}
@@ -65,7 +69,7 @@ const AdminLogin = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary"
                   placeholder="admin@burgers.com"
                 />
               </div>
@@ -84,30 +88,23 @@ const AdminLogin = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
             <div>
+              {/* Botón rojo con letras blancas */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
               >
-                {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                {loading ? 'Iniciando sesión...' : 'Ingresar'}
               </button>
             </div>
           </form>
-
-          <div className="mt-6 p-4 bg-gray-50 rounded-md">
-            <p className="text-xs text-gray-600 text-center">
-              <strong>Credenciales de prueba:</strong><br />
-              Email: admin@burgers.com<br />
-              Contraseña: admin123
-            </p>
-          </div>
         </div>
       </div>
     </div>
