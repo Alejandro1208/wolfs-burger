@@ -36,7 +36,7 @@ const AdminLogin = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
           {/* Logo del sitio */}
-          <img src={logo} alt="Wolf's Burger Logo" className="mx-auto h-24 w-auto" />
+          <img src={siteSettings.site_logo_url || staticLogo} alt="Wolf's Burger Logo" className="mx-auto h-24 w-auto" />
           {/* Título actualizado */}
           <h2 className="mt-6 text-3xl font-bold text-white">
             Panel de Administración

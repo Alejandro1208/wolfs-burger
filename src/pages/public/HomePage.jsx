@@ -7,7 +7,8 @@ import CategoryCard from "../../components/public/CategoryCard";
 const HomePage = () => {
     const { products, categories, loading } = useData();
 
-    const featuredProducts = products.slice(0, 6);
+    // Filtramos los productos para obtener solo los que están marcados como 'is_featured'
+    const featuredProducts = products.filter(product => product.is_featured);
 
     const categoryData = {
         1: {
@@ -75,22 +76,27 @@ const HomePage = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                            Nuestras{" "}
-                            <span className="text-gradient">Burgers</span>{" "}
-                            Destacadas
+                            Nuestros Productos{" "}
+                            <span className="text-gradient">Destacados</span>
                         </h2>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Descubre nuestras hamburguesas más populares,
-                            preparadas con ingredientes frescos y recetas únicas
+                            Descubre nuestros productos más populares,
+                            preparados con ingredientes frescos y recetas únicas
                             que conquistarán tu paladar.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                        {featuredProducts.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
+                    {featuredProducts.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                            {featuredProducts.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">Aún no hay productos destacados. ¡Vuelve pronto!</p>
+                        </div>
+                    )}
                 </div>
             </section>
         </div>

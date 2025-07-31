@@ -22,6 +22,14 @@ body {
   .btn-outline-white {
     @apply inline-block bg-white text-primary font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg border-2 border-white hover:bg-transparent hover:text-white;
   }
+    .input-styled {
+    @apply mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 shadow-sm transition-colors duration-200;
+    @apply focus:border-indigo-500 focus:bg-white focus:ring focus:ring-indigo-200 focus:ring-opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 font-semibold py-2 px-4 rounded-md shadow-sm transition-colors flex items-center gap-2;
+  }
 }
 
 @layer utilities {

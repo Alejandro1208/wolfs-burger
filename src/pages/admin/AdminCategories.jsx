@@ -1,209 +1,118 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Folder } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
 const AdminCategories = () => {
-  const { categories, addCategory, updateCategory, deleteCategory } = useData();
+  const { categories, addCategory, updateCategory, deleteCategory, loading } = useData();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ name: '' });
-  const [loading, setLoading] = useState(false);
+  const [currentName, setCurrentName] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleAdd = async () => {
-    if (!formData.name.trim()) return;
-    
-    setLoading(true);
-    const result = await addCategory(formData);
-    
-    if (result.success) {
-      setFormData({ name: '' });
-      setIsAdding(false);
-    }
-    setLoading(false);
+  const handleStartAdd = () => {
+    setIsAdding(true);
+    setCurrentName('');
+    setEditingId(null);
   };
 
-  const handleEdit = (category) => {
+  const handleStartEdit = (category) => {
     setEditingId(category.id);
-    setFormData({ name: category.name });
-  };
-
-  const handleUpdate = async () => {
-    if (!formData.name.trim()) return;
-    
-    setLoading(true);
-    const result = await updateCategory(editingId, formData);
-    
-    if (result.success) {
-      setEditingId(null);
-      setFormData({ name: '' });
-    }
-    setLoading(false);
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
-      return;
-    }
-
-    setLoading(true);
-    await deleteCategory(id);
-    setLoading(false);
+    setCurrentName(category.name);
+    setIsAdding(false);
   };
 
   const handleCancel = () => {
     setIsAdding(false);
     setEditingId(null);
-    setFormData({ name: '' });
+    setCurrentName('');
+  };
+
+  const handleSave = async () => {
+    if (!currentName.trim()) return;
+    setIsProcessing(true);
+    if (isAdding) {
+      await addCategory({ name: currentName });
+    }
+    if (editingId) {
+      await updateCategory({ id: editingId, name: currentName });
+    }
+    setIsProcessing(false);
+    handleCancel();
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
+      await deleteCategory(id);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
-          <p className="mt-2 text-gray-600">
-            Administra las categorías de productos
-          </p>
+          <p className="mt-2 text-gray-600">Crea, edita y elimina las categorías de tus productos.</p>
         </div>
-        
-        <button
-          onClick={() => setIsAdding(true)}
-          disabled={isAdding || editingId}
-          className="btn-primary flex items-center space-x-2 disabled:opacity-50"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Nueva Categoría</span>
+        <button onClick={handleStartAdd} disabled={isAdding || editingId} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2 disabled:opacity-50">
+          <Plus size={16}/>Nueva Categoría
         </button>
       </div>
 
-      {/* Categories Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nombre
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {/* Add New Row */}
-            {isAdding && (
-              <tr className="bg-blue-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Nuevo
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+        <div className="divide-y divide-gray-200">
+          {isAdding && (
+            <div className="p-4 flex items-center gap-4 bg-indigo-50">
+              <Folder size={20} className="text-indigo-500 flex-shrink-0" />
+              <input
+                type="text"
+                value={currentName}
+                onChange={(e) => setCurrentName(e.target.value)}
+                placeholder="Nombre de la nueva categoría"
+                className="input-styled flex-grow"
+                autoFocus
+              />
+              <button onClick={handleSave} disabled={isProcessing || !currentName.trim()} className="p-2 text-green-600 hover:bg-green-100 rounded-md transition-colors"><Save size={18}/></button>
+              <button onClick={handleCancel} className="p-2 text-gray-500 hover:bg-gray-200 rounded-md transition-colors"><X size={18}/></button>
+            </div>
+          )}
+
+          {categories.map((category) => (
+            <div key={category.id} className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
+              <Folder size={20} className="text-gray-400 flex-shrink-0" />
+              <div className="flex-grow">
+                {editingId === category.id ? (
                   <input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ name: e.target.value })}
-                    placeholder="Nombre de la categoría"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                    value={currentName}
+                    onChange={(e) => setCurrentName(e.target.value)}
+                    className="input-styled w-full"
                     autoFocus
                   />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      onClick={handleAdd}
-                      disabled={loading || !formData.name.trim()}
-                      className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                    >
-                      <Save className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      disabled={loading}
-                      className="text-gray-600 hover:text-gray-900"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )}
-
-            {/* Existing Categories */}
-            {categories.map((category) => (
-              <tr key={category.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {category.id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editingId === category.id ? (
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                      autoFocus
-                    />
-                  ) : (
-                    <div className="text-sm font-medium text-gray-900">
-                      {category.name}
-                    </div>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  {editingId === category.id ? (
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        onClick={handleUpdate}
-                        disabled={loading || !formData.name.trim()}
-                        className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                      >
-                        <Save className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        disabled={loading}
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        onClick={() => handleEdit(category)}
-                        disabled={isAdding || editingId}
-                        className="text-indigo-600 hover:text-indigo-900 disabled:opacity-50"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(category.id)}
-                        disabled={loading || isAdding || editingId}
-                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {categories.length === 0 && !isAdding && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-lg mb-2">📁</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No hay categorías
-            </h3>
-            <p className="text-gray-500">
-              Comienza agregando tu primera categoría de productos.
-            </p>
-          </div>
+                ) : (
+                  <p className="text-sm font-medium text-gray-900">{category.name}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {editingId === category.id ? (
+                  <>
+                    <button onClick={handleSave} disabled={isProcessing || !currentName.trim()} className="p-2 text-green-600 hover:bg-green-100 rounded-md transition-colors"><Save size={18}/></button>
+                    <button onClick={handleCancel} className="p-2 text-gray-500 hover:bg-gray-200 rounded-md transition-colors"><X size={18}/></button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => handleDelete(category.id)} disabled={isAdding || editingId} className="p-2 text-gray-500 hover:text-red-600 rounded-md transition-colors disabled:opacity-50" title="Eliminar"><Trash2 size={16}/></button>
+                    <button onClick={() => handleStartEdit(category)} disabled={isAdding || editingId} className="p-2 text-gray-500 hover:text-indigo-600 rounded-md transition-colors disabled:opacity-50" title="Editar"><Edit size={16}/></button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        {loading && <p className="text-center py-4 text-gray-500">Cargando...</p>}
+        {!loading && categories.length === 0 && !isAdding && (
+            <div className="text-center py-12">
+                <p className="text-gray-500">No hay categorías. ¡Crea la primera!</p>
+            </div>
         )}
       </div>
     </div>

@@ -1,270 +1,299 @@
-import React, { useState, useEffect } from 'react';
-import { X, Upload, Trash2 } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import React, { useState, useEffect } from "react";
+import { X, Upload, Trash2 } from "lucide-react";
+import { useData } from "../../contexts/DataContext";
 
 const ProductForm = ({ product, onClose }) => {
-  const { categories, addProduct, updateProduct } = useData();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category_id: '',
-    pedidosya_link: '',
-    images: []
-  });
+    const { categories, addProduct, updateProduct } = useData();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name || '',
-        description: product.description || '',
-        price: product.price || '',
-        category_id: product.category_id || '',
-        pedidosya_link: product.pedidosya_link || '',
-        images: product.images || []
-      });
-    }
-  }, [product]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    
-    // In a real app, you would upload these files to the server
-    // For now, we'll create object URLs for preview
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setFormData(prev => ({
-          ...prev,
-          images: [...prev.images, event.target.result]
-        }));
-      };
-      reader.readAsDataURL(file);
+    const [formData, setFormData] = useState({
+        name: "",
+        description: "",
+        price: "",
+        category_id: "",
+        pedidosya_link: "",
     });
-  };
+    const [isFeatured, setIsFeatured] = useState(false);
+    const [existingImages, setExistingImages] = useState([]);
+    const [newImageFiles, setNewImageFiles] = useState([]);
+    const [newImagePreviews, setNewImagePreviews] = useState([]);
 
-  const handleRemoveImage = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
-  };
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    useEffect(() => {
+        if (product) {
+            setFormData({
+                name: product.name || "",
+                description: product.description || "",
+                price: product.price || "",
+                category_id: product.category_id || "",
+                pedidosya_link: product.pedidosya_link || "",
+            });
+            setIsFeatured(product.is_featured === true);
+            setExistingImages(product.images || []);
+        }
+    }, [product]);
 
-    try {
-      const productData = {
-        ...formData,
-        price: parseFloat(formData.price),
-        category_name: categories.find(cat => cat.id === parseInt(formData.category_id))?.name
-      };
+    const handleInputChange = (e) =>
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-      let result;
-      if (product) {
-        result = await updateProduct(product.id, productData);
-      } else {
-        result = await addProduct(productData);
-      }
+    const handleImageUpload = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length) {
+            setNewImageFiles((prev) => [...prev, ...files]);
+            const previews = files.map((file) => URL.createObjectURL(file));
+            setNewImagePreviews((prev) => [...prev, ...previews]);
+        }
+    };
 
-      if (result.success) {
-        onClose();
-      }
-    } catch (error) {
-      console.error('Error saving product:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const removeExistingImage = (id) =>
+        setExistingImages((prev) => prev.filter((img) => img.id !== id));
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {product ? 'Editar Producto' : 'Nuevo Producto'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+    const removeNewImage = (index) => {
+        setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
+        setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    };
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nombre del Producto *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              placeholder="Ej: Doble Cheddar Clásica"
-            />
-          </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Descripción *
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              placeholder="Describe los ingredientes y características del producto"
-            />
-          </div>
+        const submissionData = new FormData();
+        Object.keys(formData).forEach((key) =>
+            submissionData.append(key, formData[key])
+        );
+        submissionData.append("is_featured", isFeatured);
 
-          {/* Price and Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Precio *
-              </label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                required
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                placeholder="0.00"
-              />
-            </div>
+        if (product) {
+            submissionData.append("id", product.id);
+            submissionData.append(
+                "existing_images",
+                JSON.stringify(existingImages)
+            );
+        }
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Categoría *
-              </label>
-              <select
-                name="category_id"
-                value={formData.category_id}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="">Seleccionar categoría</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+        newImageFiles.forEach((file) => {
+            submissionData.append("new_images[]", file);
+        });
 
-          {/* PedidosYa Link */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Enlace de PedidosYa
-            </label>
-            <input
-              type="url"
-              name="pedidosya_link"
-              value={formData.pedidosya_link}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              placeholder="https://pedidosya.com.ar/..."
-            />
-          </div>
+        try {
+            const result = product
+                ? await updateProduct(submissionData)
+                : await addProduct(submissionData);
+            if (result.success) {
+                onClose();
+            } else {
+                setError(result.error || "Ocurrió un error al guardar.");
+            }
+        } catch (e) {
+            setError("Ocurrió un error de conexión.");
+        }
+        setLoading(false);
+    };
 
-          {/* Images */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Imágenes del Producto (máximo 3)
-            </label>
-            
-            {/* Current Images */}
-            {formData.images.length > 0 && (
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                {formData.images.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={image}
-                      alt={`Producto ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-md border"
-                    />
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        {product ? "Editar Producto" : "Nuevo Producto"}
+                    </h2>
                     <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        type="button"
+                        onClick={onClose}
+                        className="p-1 rounded-full hover:bg-gray-200 transition-colors"
                     >
-                      <Trash2 className="h-3 w-3" />
+                        <X size={20} />
                     </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                </div>
 
-            {/* Upload Button */}
-            {formData.images.length < 3 && (
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-gray-400 transition-colors">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600">
-                    Haz clic para subir imágenes
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG hasta 5MB cada una
-                  </p>
-                </label>
-              </div>
-            )}
-          </div>
+                <form
+                    id="product-form"
+                    onSubmit={handleSubmit}
+                    className="p-6 space-y-4 flex-grow overflow-y-auto"
+                >
+                    {error && (
+                        <p className="text-red-500 bg-red-50 p-3 rounded-md text-sm">
+                            {error}
+                        </p>
+                    )}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Nombre del Producto *
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            required
+                            className="input-styled"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Descripción *
+                        </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            required
+                            className="input-styled"
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Precio *
+                            </label>
+                            <input
+                                type="number"
+                                name="price"
+                                value={formData.price}
+                                onChange={handleInputChange}
+                                required
+                                min="0"
+                                step="0.01"
+                                className="input-styled"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Categoría *
+                            </label>
+                            <select
+                                name="category_id"
+                                value={formData.category_id}
+                                onChange={handleInputChange}
+                                required
+                                className="input-styled"
+                            >
+                                <option value="">Seleccionar categoría</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Enlace de PedidosYa
+                        </label>
+                        <input
+                            type="url"
+                            name="pedidosya_link"
+                            value={formData.pedidosya_link}
+                            onChange={handleInputChange}
+                            className="input-styled"
+                        />
+                    </div>
+                    <div className="flex items-center">
+                        <input
+                            id="is_featured"
+                            name="is_featured"
+                            type="checkbox"
+                            checked={isFeatured}
+                            onChange={(e) => setIsFeatured(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <label
+                            htmlFor="is_featured"
+                            className="ml-2 block text-sm text-gray-900"
+                        >
+                            Marcar como Producto Destacado
+                        </label>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Imágenes
+                        </label>
+                        <div className="grid grid-cols-3 gap-4 mt-2">
+                            {existingImages.map((img) => (
+                                <div key={img.id} className="relative group">
+                                    <img
+                                        src={img.image_url}
+                                        alt="Imagen existente"
+                                        className="w-full h-24 object-cover rounded-md border"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            removeExistingImage(img.id)
+                                        }
+                                        className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                            {newImagePreviews.map((preview, index) => (
+                                <div key={index} className="relative group">
+                                    <img
+                                        src={preview}
+                                        alt="Nueva imagen"
+                                        className="w-full h-24 object-cover rounded-md border border-dashed border-indigo-500"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeNewImage(index)}
+                                        className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                            <label
+                                htmlFor="image-upload"
+                                className="w-full h-24 flex flex-col items-center justify-center border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                                <Upload size={24} className="text-gray-400" />
+                                <span className="text-xs text-gray-500 mt-1">
+                                    Subir imagen
+                                </span>
+                                <input
+                                    id="image-upload"
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </form>
 
-          {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Guardando...' : (product ? 'Actualizar' : 'Crear')} Producto
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+                <div className="flex justify-end space-x-3 p-4 border-t bg-gray-50 flex-shrink-0">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        form="product-form"
+                        disabled={loading}
+                        className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all disabled:opacity-50"
+                    >
+                        {loading ? "Guardando..." : "Guardar Producto"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default ProductForm;

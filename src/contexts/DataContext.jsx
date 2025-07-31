@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DataContext = createContext();
-const BASE_API_URL = 'https://alejandrosabater.com.ar/api'; // La URL de nuestra API
+const BASE_API_URL = 'https://alejandrosabater.com.ar/api';
 
 export const useData = () => {
   const context = useContext(DataContext);
@@ -15,32 +15,32 @@ export const DataProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [heroContent, setHeroContent] = useState({});
   const [siteSettings, setSiteSettings] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Función para cargar todos los datos iniciales desde el backend
   const fetchData = async () => {
-    setLoading(true);
     try {
-      // Usamos Promise.all para hacer todas las peticiones en paralelo
-      const [categoriesRes, productsRes, bannersRes, settingsRes] = await Promise.all([
+      const [bannersRes, heroRes, categoriesRes, settingsRes, productsRes] = await Promise.all([
+        fetch(`${BASE_API_URL}/banners.php`),
+        fetch(`${BASE_API_URL}/hero.php`),
         fetch(`${BASE_API_URL}/getCategorias.php`),
-        // Aún no hemos creado los otros endpoints, los añadiremos aquí a medida que los hagamos
-        // fetch(`${BASE_API_URL}/getProducts.php`),
-        // fetch(`${BASE_API_URL}/getBanners.php`),
-        // fetch(`${BASE_API_URL}/getSiteSettings.php`),
+        fetch(`${BASE_API_URL}/settings.php`),
+        fetch(`${BASE_API_URL}/products.php`), // <-- Se añade la petición de productos
       ]);
 
+      const bannersData = await bannersRes.json();
+      const heroData = await heroRes.json();
       const categoriesData = await categoriesRes.json();
-      // const productsData = await productsRes.json();
-      // const bannersData = await bannersRes.json();
-      // const settingsData = await settingsRes.json();
+      const settingsData = await settingsRes.json();
+      const productsData = await productsRes.json(); // <-- Se obtienen los datos de productos
       
+      setBanners(bannersData || []);
+      setHeroContent(heroData || {});
       setCategories(categoriesData || []);
-      // setProducts(productsData || []);
-      // setBanners(bannersData || []);
-      // setSiteSettings(settingsData || {});
-      
+      setSiteSettings(settingsData || {});
+      setProducts(productsData || []); // <-- Se guardan los productos en el estado
+
     } catch (error) {
       console.error("Error fetching data from API:", error);
     } finally {
@@ -48,58 +48,90 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  // Cargar los datos cuando el componente se monta por primera vez
   useEffect(() => {
     fetchData();
   }, []);
 
-  // --- FUNCIONES DE ESCRITURA CONECTADAS ---
-
-  const addCategory = async (categoryData) => {
-    const response = await fetch(`${BASE_API_URL}/createCategory.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(categoryData)
-    });
+  // --- FUNCIONES DE PORTADA (Banners & Hero) ---
+  const addBanner = async (formData) => {
+    const response = await fetch(`${BASE_API_URL}/banners.php`, { method: 'POST', body: formData });
     const result = await response.json();
-    if (result.success) {
-      fetchData(); // Recargar todos los datos para ver el cambio
-    }
-    return result;
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
   };
 
-  const deleteCategory = async (id) => {
-    const response = await fetch(`${BASE_API_URL}/deleteCategory.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    });
+  const deleteBanner = async (id) => {
+    const response = await fetch(`${BASE_API_URL}/banners.php`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
     const result = await response.json();
-    if (result.success) {
-      fetchData(); // Recargar todos los datos para ver el cambio
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
+  };
+  
+  const updateHeroContent = async (heroData) => {
+    const response = await fetch(`${BASE_API_URL}/hero.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(heroData) });
+    const result = await response.json();
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
+  };
+  
+  // --- FUNCIONES DE CONFIGURACIÓN GENERAL ---
+  const updateSiteSettings = async (formData) => { // Ahora recibe FormData
+    try {
+      const response = await fetch(`${BASE_API_URL}/settings.php`, {
+        method: 'POST',
+        body: formData, // No se necesita 'headers', el navegador lo pone automáticamente
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        fetchData(); // Recargamos los datos para ver el nuevo logo
+      }
+      return { success: response.ok, ...result };
+    } catch (error) {
+      return { success: false, error: 'Error de red al guardar la configuración.' };
     }
-    return result;
   };
 
-  // Las otras funciones aún están simuladas, las conectaremos después
-  const updateCategory = async (id, categoryData) => { alert('Función "Actualizar Categoría" pendiente.'); return { success: false }; };
-  const addProduct = async (productData) => { alert('Función "Añadir Producto" pendiente.'); return { success: false }; };
-  const updateProduct = async (id, productData) => { alert('Función "Actualizar Producto" pendiente.'); return { success: false }; };
-  const deleteProduct = async (id) => { alert('Función "Eliminar Producto" pendiente.'); return { success: false }; };
+
+  // --- FUNCIONES CRUD PARA PRODUCTOS (NUEVAS) ---
+  const addProduct = async (formData) => {
+    const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'POST', body: formData });
+    const result = await response.json();
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+  const updateProduct = async (formData) => {
+    formData.append('_method', 'PUT'); // Simulamos un método PUT para la actualización
+    const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'POST', body: formData });
+    const result = await response.json();
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+  const deleteProduct = async (id) => {
+    const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const result = await response.json();
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
+  };
 
   const value = {
+    // Estados
     categories,
     products,
     banners,
+    heroContent,
     siteSettings,
     loading,
+    // Funciones
     fetchData,
-    addCategory,
-    updateCategory,
-    deleteCategory,
+    addBanner,
+    deleteBanner,
+    updateHeroContent,
+    updateSiteSettings,
     addProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
   };
 
   return (

@@ -1,38 +1,60 @@
-import React, { useState } from 'react';
-import { Save } from 'lucide-react';
+// src/pages/admin/AdminSettings.jsx
+import React, { useState, useEffect } from 'react';
+import { Save, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
 const AdminSettings = () => {
-  const { siteSettings } = useData();
-  const [formData, setFormData] = useState(siteSettings);
+  const { siteSettings, updateSiteSettings } = useData();
+  const [formData, setFormData] = useState({});
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  useEffect(() => {
+    if (siteSettings) {
+      setFormData({
+        contact_phone: siteSettings.contact_phone || '',
+        contact_email: siteSettings.contact_email || '',
+        address: siteSettings.address || '',
+        hours: siteSettings.hours || '',
+        facebook_url: siteSettings.facebook_url || '',
+        instagram_url: siteSettings.instagram_url || '',
+      });
+      setLogoPreview(siteSettings.site_logo_url || '');
+    }
+  }, [siteSettings]);
+
+  const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSaved(false);
 
-    // In a real app, this would save to PHP backend
-    // await fetch('/api/settings', {
-    //   method: 'PUT',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData)
-    // });
+    const submissionData = new FormData();
+    Object.keys(formData).forEach(key => {
+      submissionData.append(key, formData[key]);
+    });
+    if (logoFile) {
+      submissionData.append('site_logo', logoFile);
+    }
 
-    // Mock save
-    setTimeout(() => {
-      setLoading(false);
+    const result = await updateSiteSettings(submissionData);
+
+    if (result.success) {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    }, 1000);
+    }
+    setLoading(false);
   };
 
   return (
@@ -54,7 +76,21 @@ const AdminSettings = () => {
 
       {/* Settings Form */}
       <div className="bg-white shadow rounded-lg">
+        
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* SECCIÓN DEL LOGO */}
+          <div>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Logo del Sitio</h2>
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                {logoPreview ? <img src={logoPreview} alt="Logo actual" className="w-full h-full object-cover"/> : <ImageIcon className="text-gray-400"/>}
+              </div>
+              <label htmlFor="logo-upload" className="btn-secondary cursor-pointer">
+                Cambiar Logo
+                <input id="logo-upload" type="file" className="hidden" accept="image/png, image/jpeg, image/svg+xml" onChange={handleLogoChange} />
+              </label>
+            </div>
+          </div>
           {/* Contact Information */}
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">

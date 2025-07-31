@@ -21,7 +21,7 @@ const PublicHeader = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <img src={logo} alt="Wolf's Burger Logo" className="h-20 w-auto" />
+              <img src={siteSettings.site_logo_url || staticLogo} alt="Wolf's Burger Logo" className="h-20 w-auto" />
             </Link>
           </div>
 

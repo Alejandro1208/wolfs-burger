@@ -1,142 +1,139 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Upload } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Save, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
 const AdminBanners = () => {
-  const { banners } = useData();
+  const { banners, heroContent, addBanner, deleteBanner, updateHeroContent, loading } = useData();
+  
+  const [formData, setFormData] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleFileUpload = async (event) => {
+  useEffect(() => {
+    if (heroContent) {
+      setFormData({
+        title: heroContent.title || '',
+        subtitle: heroContent.subtitle || '',
+        cta1_text: heroContent.cta1_text || '',
+        cta1_link: heroContent.cta1_link || '',
+        cta2_text: heroContent.cta2_text || '',
+        cta2_link: heroContent.cta2_link || '',
+      });
+    }
+  }, [heroContent]);
+
+  const handleInputChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+  
+  const showSuccessMessage = (message) => {
+    setSuccess(message);
+    setTimeout(() => setSuccess(''), 3000);
+  };
+
+  const handleContentSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setError('');
+    const result = await updateHeroContent(formData);
+    if(result.success) {
+      showSuccessMessage('Contenido guardado exitosamente.');
+    } else {
+      setError(result.error || 'No se pudo guardar el contenido.');
+    }
+    setIsSaving(false);
+  };
+
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setIsUploading(true);
+    setError('');
     
-    // In a real app, this would upload to PHP backend
-    // const formData = new FormData();
-    // formData.append('banner', file);
-    // const response = await fetch('/api/banners', {
-    //   method: 'POST',
-    //   body: formData
-    // });
+    const uploadFormData = new FormData();
+    uploadFormData.append('banner', file);
     
-    // Mock upload
-    setTimeout(() => {
-      setIsUploading(false);
-      alert('Banner subido exitosamente (simulado)');
-    }, 2000);
-  };
-
-  const handleDelete = async (bannerId) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este banner?')) {
-      return;
+    const result = await addBanner(uploadFormData);
+    if (!result.success) {
+      setError(result.error || 'Error al subir la imagen.');
+    } else {
+      showSuccessMessage('Imagen subida exitosamente.');
     }
-
-    // In a real app: await fetch(`/api/banners/${bannerId}`, { method: 'DELETE' })
-    alert('Banner eliminado exitosamente (simulado)');
+    setIsUploading(false);
+    event.target.value = null;
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Banners</h1>
-          <p className="mt-2 text-gray-600">
-            Administra las imágenes del carrusel principal
-          </p>
-        </div>
-        
-        <div className="relative">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            disabled={isUploading}
-          />
-          <button
-            disabled={isUploading}
-            className="btn-primary flex items-center space-x-2 disabled:opacity-50"
-          >
-            {isUploading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Subiendo...</span>
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4" />
-                <span>Agregar Banner</span>
-              </>
-            )}
-          </button>
-        </div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Configuración de Portada</h1>
+        <p className="mt-2 text-gray-600">
+          Edita el texto principal y gestiona las imágenes de fondo del carrusel.
+        </p>
       </div>
 
-      {/* Banners Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {banners.map((banner, index) => (
-          <div key={banner.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="aspect-w-16 aspect-h-9 h-48">
-              <img
-                src={banner.image_url}
-                alt={`Banner ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium text-gray-900">Banner {index + 1}</h3>
-                  <p className="text-sm text-gray-500">Activo</p>
+      {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 flex items-center gap-3" role="alert"><AlertCircle size={20}/><p>{error}</p></div>}
+      {success && <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 flex items-center gap-3" role="alert"><CheckCircle size={20}/><p>{success}</p></div>}
+      
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <form onSubmit={handleContentSubmit} className="space-y-6">
+          <h2 className="text-xl font-semibold text-gray-800 border-b pb-3">Contenido Fijo de la Portada</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Título</label>
+            <input type="text" name="title" value={formData.title || ''} onChange={handleInputChange} className="input-styled" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Subtítulo</label>
+            <textarea name="subtitle" value={formData.subtitle || ''} onChange={handleInputChange} className="input-styled" rows="2"></textarea>
+          </div>
+          <fieldset className="border p-4 rounded-md space-y-3">
+            <legend className="text-sm font-medium px-1">Botón 1 (Principal)</legend>
+            <input type="text" name="cta1_text" value={formData.cta1_text || ''} onChange={handleInputChange} placeholder="Texto del botón (ej: Ver Menú)" className="input-styled"/>
+            <input type="text" name="cta1_link" value={formData.cta1_link || ''} onChange={handleInputChange} placeholder="Enlace (ej: /menu)" className="input-styled"/>
+          </fieldset>
+          <fieldset className="border p-4 rounded-md space-y-3">
+            <legend className="text-sm font-medium px-1">Botón 2 (Secundario)</legend>
+            <input type="text" name="cta2_text" value={formData.cta2_text || ''} onChange={handleInputChange} placeholder="Texto del botón (ej: Pedir Ahora)" className="input-styled"/>
+            <input type="text" name="cta2_link" value={formData.cta2_link || ''} onChange={handleInputChange} placeholder="Enlace (URL completa de PedidosYa)" className="input-styled"/>
+          </fieldset>
+          <div className="flex justify-end pt-2">
+            <button type="submit" disabled={isSaving} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2 disabled:opacity-50">
+              <Save size={16}/>{isSaving ? 'Guardando...' : 'Guardar Contenido'}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <div className="flex justify-between items-center border-b pb-3 mb-4">
+           <h2 className="text-xl font-semibold text-gray-800">Imágenes del Carrusel</h2>
+           <label htmlFor="image-upload-input" className={`bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm cursor-pointer transition-colors flex items-center gap-2 ${isUploading && 'opacity-50'}`}>
+              {isUploading ? 'Subiendo...' : <><Upload size={16}/> Agregar Imagen</>}
+              <input id="image-upload-input" type="file" onChange={handleImageUpload} disabled={isUploading} className="hidden"/>
+           </label>
+        </div>
+        {loading && <p className="text-center text-gray-500 py-4">Cargando imágenes...</p>}
+        {!loading && banners.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">No hay imágenes en el carrusel.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {banners.map(banner => (
+              <div key={banner.id} className="relative group rounded-md overflow-hidden aspect-video shadow-sm">
+                <img src={banner.image_url} alt={banner.alt_text || ''} className="w-full h-full object-cover"/>
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button onClick={() => deleteBanner(banner.id)} className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors" title="Eliminar Imagen">
+                    <Trash2 size={16}/>
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleDelete(banner.id)}
-                  className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-md transition-colors"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
-
-        {/* Upload Card */}
-        <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-          <div className="relative">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              disabled={isUploading}
-            />
-            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-sm font-medium text-gray-900 mb-2">
-              Subir nuevo banner
-            </p>
-            <p className="text-xs text-gray-500">
-              PNG, JPG hasta 10MB
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-        <h3 className="text-sm font-medium text-blue-800 mb-2">
-          Instrucciones para banners:
-        </h3>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Resolución recomendada: 1920x1080 píxeles</li>
-          <li>• Formato: JPG o PNG</li>
-          <li>• Tamaño máximo: 10MB</li>
-          <li>• Los banners se muestran en orden de subida</li>
-        </ul>
+        )}
       </div>
     </div>
   );
 };
-
 export default AdminBanners;

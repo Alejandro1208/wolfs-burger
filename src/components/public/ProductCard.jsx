@@ -6,55 +6,64 @@ const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = (e) => {
-    e.preventDefault(); // Evita que el enlace del contenedor se active
+    e.preventDefault();
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    if (product.images && product.images.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    }
   };
 
   const prevImage = (e) => {
-    e.preventDefault(); // Evita que el enlace del contenedor se active
+    e.preventDefault();
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    if (product.images && product.images.length > 1) {
+      setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
   };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
-      minimumFractionDigits: 0,
     }).format(price);
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden card-hover flex flex-col">
-      {/* Carrusel de Imágenes */}
-      <div className="relative h-56 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+      <div className="relative h-56 overflow-hidden bg-gray-200">
         {product.images && product.images.length > 0 ? (
           <>
-            <img src={product.images[currentImageIndex]} alt={product.name} className="w-full h-full object-cover" />
+            <img 
+              src={product.images[currentImageIndex].image_url} 
+              alt={product.name} 
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+            />
             {product.images.length > 1 && (
               <>
-                <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-1 rounded-full hover:bg-black/60 transition-all"><ChevronLeft size={20} /></button>
-                <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-1 rounded-full hover:bg-black/60 transition-all"><ChevronRight size={20} /></button>
+                <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><ChevronLeft size={20} /></button>
+                <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><ChevronRight size={20} /></button>
               </>
             )}
           </>
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center"><span className="text-gray-400">Sin imagen</span></div>
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-gray-400">Sin imagen</span>
+          </div>
         )}
       </div>
 
-      {/* Contenido */}
       <div className="p-4 flex flex-col flex-grow">
-        <span className="inline-block bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full font-medium mb-2 self-start">{product.category_name}</span>
+        <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-semibold mb-2 self-start">{product.category_name}</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
-        <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow">{product.description}</p>
+        <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow line-clamp-3">{product.description}</p>
         <div className="flex items-center justify-between mt-auto">
           <div className="text-2xl font-bold text-primary">{formatPrice(product.price)}</div>
-          <a href={product.pedidosya_link} target="_blank" rel="noopener noreferrer" className="bg-[#ec2f42] hover:bg-[#c5273a] text-white font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md">
-            <span className="block text-xs">Pedir en</span>
-            <img src={pedidosyaLogo} alt="PedidosYa" className="h-5 w-auto mx-auto" />
-          </a>
+          {product.pedidosya_link && (
+            <a href={product.pedidosya_link} target="_blank" rel="noopener noreferrer" className="bg-[#ec2f42] hover:bg-[#c5273a] text-white font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex-shrink-0">
+              <span className="block text-xs">Pedir en</span>
+              <img src={pedidosyaLogo} alt="PedidosYa" className="h-5 w-auto mx-auto" />
+            </a>
+          )}
         </div>
       </div>
     </div>

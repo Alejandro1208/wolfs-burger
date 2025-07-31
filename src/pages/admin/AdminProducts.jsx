@@ -1,187 +1,116 @@
-import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Plus, Edit, Trash2, Package, Star } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import ProductForm from '../../components/admin/ProductForm';
 
 const AdminProducts = () => {
-  const { products, categories, deleteProduct } = useData();
+  const { products, categories, deleteProduct, loading } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState('all');
 
-  const filteredProducts = selectedCategory 
-    ? products.filter(product => product.category_id === parseInt(selectedCategory))
-    : products;
+  const filteredProducts = useMemo(() => {
+    if (filter === 'all') return products;
+    if (filter === 'featured') return products.filter(p => p.is_featured);
+    return products.filter(p => p.category_id == filter);
+  }, [products, filter]);
 
   const handleEdit = (product) => {
     setEditingProduct(product);
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      return;
-    }
-
-    setLoading(true);
-    await deleteProduct(id);
-    setLoading(false);
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
+  const handleNew = () => {
     setEditingProduct(null);
+    setShowForm(true);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0,
-    }).format(price);
+  const handleCloseForm = () => setShowForm(false);
+
+  const handleDelete = async (id) => {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.')) {
+      await deleteProduct(id);
+    }
   };
+
+  const formatPrice = (price) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(price);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Gestión de Productos</h1>
-          <p className="mt-2 text-gray-600">
-            Administra el catálogo de productos
-          </p>
+          <p className="mt-2 text-gray-600">Crea, edita y elimina los productos de tu menú.</p>
         </div>
-        
-        <button
-          onClick={() => setShowForm(true)}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Nuevo Producto</span>
+        <button onClick={handleNew} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2">
+          <Plus size={16}/>Nuevo Producto
         </button>
       </div>
-
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex items-center space-x-4">
-          <label className="text-sm font-medium text-gray-700">
-            Filtrar por categoría:
-          </label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="">Todas las categorías</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
+      
+      <div className="bg-white p-4 rounded-lg shadow-sm flex items-center gap-4">
+        <label htmlFor="category-filter" className="text-sm font-medium text-gray-700">Filtrar por:</label>
+        <select
+          id="category-filter"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        >
+          <option value="all">Todas las categorías</option>
+          <option value="featured">Solo Destacados</option>
+          <optgroup label="Categorías">
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
-          </select>
-          <span className="text-sm text-gray-500">
-            {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''}
-          </span>
-        </div>
+          </optgroup>
+        </select>
+        <span className="text-sm text-gray-500">{filteredProducts.length} producto(s)</span>
       </div>
-
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Product Image */}
-            <div className="h-48 overflow-hidden">
-              {product.images && product.images.length > 0 ? (
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400">Sin imagen</span>
-                </div>
-              )}
-            </div>
-
-            {/* Product Info */}
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="inline-block bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full font-medium">
-                  {product.category_name}
-                </span>
-                <span className="text-xs text-gray-500">ID: {product.id}</span>
-              </div>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {product.name}
-              </h3>
-              
-              <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                {product.description}
-              </p>
-              
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xl font-bold text-primary-600">
-                  {formatPrice(product.price)}
-                </span>
-                <div className="flex items-center space-x-1">
-                  {product.images && product.images.length > 0 ? (
-                    <Eye className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  )}
-                  <span className="text-xs text-gray-500">
-                    {product.images ? product.images.length : 0} img
-                  </span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleEdit(product)}
-                  className="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  <Edit className="h-4 w-4 inline mr-1" />
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(product.id)}
-                  disabled={loading}
-                  className="flex-1 bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4 inline mr-1" />
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">🍔</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No hay productos
-          </h3>
-          <p className="text-gray-500">
-            {selectedCategory 
-              ? 'No se encontraron productos en esta categoría.'
-              : 'Comienza agregando tu primer producto.'
-            }
-          </p>
+      
+      {loading && <p className="text-center py-12 text-gray-500">Cargando productos...</p>}
+      
+      {!loading && filteredProducts.length === 0 && (
+        <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-dashed">
+          <Package size={48} className="mx-auto text-gray-300" />
+          <h3 className="mt-4 text-lg font-medium text-gray-900">No se encontraron productos</h3>
+          <p className="mt-1 text-sm text-gray-500">Prueba con otro filtro o agrega un nuevo producto.</p>
         </div>
       )}
 
-      {/* Product Form Modal */}
+      {!loading && filteredProducts.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+              <div className="w-full h-48 bg-gray-200 overflow-hidden relative">
+                <img
+                  src={product.images.length > 0 ? product.images[0].image_url : 'https://via.placeholder.com/400x300?text=Sin+Imagen'}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                 {product.is_featured === true && (
+                    <div className="absolute top-2 right-2 bg-amber-400 p-1.5 rounded-full shadow-lg">
+                        <Star size={16} className="text-white" fill="currentColor"/>
+                    </div>
+                 )}
+              </div>
+              <div className="p-4 flex-grow flex flex-col">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-semibold bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">{product.category_name || 'Sin categoría'}</span>
+                  <span className="text-xl font-bold text-primary">{formatPrice(product.price)}</span>
+                </div>
+                <h3 className="text-lg font-semibold my-2 text-gray-800">{product.name}</h3>
+                <p className="text-sm text-gray-600 flex-grow line-clamp-3">{product.description}</p>
+              </div>
+              <div className="bg-gray-50 p-3 flex justify-end gap-2 border-t">
+                <button onClick={() => handleDelete(product.id)} className="p-2 text-gray-500 hover:text-red-600 rounded-md transition-colors" title="Eliminar"><Trash2 size={16}/></button>
+                <button onClick={() => handleEdit(product)} className="p-2 text-gray-500 hover:text-indigo-600 rounded-md transition-colors" title="Editar"><Edit size={16}/></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {showForm && (
-        <ProductForm
-          product={editingProduct}
-          onClose={handleCloseForm}
-        />
+        <ProductForm product={editingProduct} onClose={handleCloseForm} />
       )}
     </div>
   );

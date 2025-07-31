@@ -33,7 +33,7 @@ const AdminSidebar = () => {
       {/* CAMBIO: Logo en la parte superior */}
       <div className="p-6 border-b border-white/20 flex justify-center">
         <Link to="/admin">
-          <img src={logo} alt="Wolf's Burger Logo" className="h-20 w-auto" />
+          <img src={siteSettings.site_logo_url || staticLogo} alt="Wolf's Burger Logo" className="h-20 w-auto" />
         </Link>
       </div>
 
