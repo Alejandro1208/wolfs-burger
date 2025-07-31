@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: 192 57 43;   /* #c0392b en formato RGB */
+  --color-secondary: 231 76 60;  /* #e74c3c en formato RGB */
+  --color-accent: 243 156 18;   /* #f39c12 en formato RGB */
+}
+
+
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
 body {

@@ -23,7 +23,7 @@ const MenuPage = () => {
     }
   }, [searchParams, orderedCategories]);
 
-  const filteredProducts = products.filter(product => product.category_id === selectedCategory);
+  const filteredProducts = products.filter(product => product.category_id == selectedCategory);
 
   const handleCategoryFilter = (categoryId) => {
     setSelectedCategory(categoryId);
