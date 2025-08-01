@@ -5,9 +5,7 @@ const BASE_API_URL = 'https://alejandrosabater.com.ar/api';
 
 export const useData = () => {
   const context = useContext(DataContext);
-  if (!context) {
-    throw new Error('useData must be used within a DataProvider');
-  }
+  if (!context) throw new Error('useData must be used within a DataProvider');
   return context;
 };
 
@@ -17,8 +15,8 @@ export const DataProvider = ({ children }) => {
   const [banners, setBanners] = useState([]);
   const [heroContent, setHeroContent] = useState({});
   const [siteSettings, setSiteSettings] = useState({});
-  const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -28,21 +26,21 @@ export const DataProvider = ({ children }) => {
         fetch(`${BASE_API_URL}/getCategorias.php`),
         fetch(`${BASE_API_URL}/settings.php`),
         fetch(`${BASE_API_URL}/products.php`),
-        fetch(`${BASE_API_URL}/users.php`), 
+        fetch(`${BASE_API_URL}/users.php`),
       ]);
 
       const bannersData = await bannersRes.json();
       const heroData = await heroRes.json();
       const categoriesData = await categoriesRes.json();
       const settingsData = await settingsRes.json();
-      const productsData = await productsRes.json(); 
+      const productsData = await productsRes.json();
       const usersData = await usersRes.json();
       
       setBanners(bannersData || []);
       setHeroContent(heroData || {});
       setCategories(categoriesData || []);
       setSiteSettings(settingsData || {});
-      setProducts(productsData || []); 
+      setProducts(productsData || []);
       setUsers(usersData || []);
 
     } catch (error) {
@@ -56,7 +54,7 @@ export const DataProvider = ({ children }) => {
     fetchData();
   }, []);
 
-
+  // --- OTRAS FUNCIONES ---
   const addBanner = async (formData) => {
     const response = await fetch(`${BASE_API_URL}/banners.php`, { method: 'POST', body: formData });
     const result = await response.json();
@@ -77,23 +75,13 @@ export const DataProvider = ({ children }) => {
     if (response.ok && result.success) fetchData();
     return { success: response.ok, ...result };
   };
-
+  
   const updateSiteSettings = async (formData) => {
-    try {
-      const response = await fetch(`${BASE_API_URL}/settings.php`, {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-      if (response.ok && result.success) {
-        fetchData(); 
-      }
-      return { success: response.ok, ...result };
-    } catch (error) {
-      return { success: false, error: 'Error de red al guardar la configuración.' };
-    }
+    const response = await fetch(`${BASE_API_URL}/settings.php`, { method: 'POST', body: formData });
+    const result = await response.json();
+    if (response.ok && result.success) fetchData();
+    return { success: response.ok, ...result };
   };
-
 
   const addProduct = async (formData) => {
     const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'POST', body: formData });
@@ -103,7 +91,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateProduct = async (formData) => {
-    formData.append('_method', 'PUT'); 
+    formData.append('_method', 'PUT');
     const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'POST', body: formData });
     const result = await response.json();
     if (response.ok && result.success) fetchData();
@@ -117,8 +105,9 @@ export const DataProvider = ({ children }) => {
     return { success: response.ok, ...result };
   };
 
-    const addCategory = async (formData) => {
-    const response = await fetch(`${BASE_API_URL}/categories.php`, { method: 'POST', body: formData });
+  // --- FUNCIONES CRUD PARA CATEGORÍAS (CORREGIDAS) ---
+  const addCategory = async (formData) => {
+    const response = await fetch(`${BASE_API_URL}/getCategorias.php`, { method: 'POST', body: formData });
     const result = await response.json();
     if (response.ok) fetchData();
     return { success: response.ok, ...result };
@@ -126,23 +115,23 @@ export const DataProvider = ({ children }) => {
 
   const updateCategory = async (formData) => {
     formData.append('_method', 'PUT');
-    const response = await fetch(`${BASE_API_URL}/categories.php`, { method: 'POST', body: formData });
+    const response = await fetch(`${BASE_API_URL}/getCategorias.php`, { method: 'POST', body: formData });
     const result = await response.json();
     if (response.ok) fetchData();
     return { success: response.ok, ...result };
   };
 
   const deleteCategory = async (id) => {
-    const response = await fetch(`${BASE_API_URL}/categories.php`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const response = await fetch(`${BASE_API_URL}/getCategorias.php`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
     const result = await response.json();
     if (response.ok) fetchData();
     return { success: response.ok, ...result };
   };
-
+  
   const addUser = async (userData) => {
     const response = await fetch(`${BASE_API_URL}/users.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
     const result = await response.json();
-    if (response.ok) fetchData();
+    if (response.ok) fetchData();x
     return { success: response.ok, ...result };
   };
 
@@ -160,30 +149,12 @@ export const DataProvider = ({ children }) => {
     return { success: response.ok, ...result };
   };
 
-
   const value = {
-    categories,
-    products,
-    banners,
-    heroContent,
-    siteSettings,
-    loading,
-    fetchData,
-    addBanner,
-    deleteBanner,
-    updateHeroContent,
-    updateSiteSettings,
-    addProduct,
-    updateProduct,
-    deleteProduct,
-    addCategory,
-    updateCategory,
-    deleteCategory,
-    users,
-    addUser,
-    updateUser,
-    deleteUser,
-
+    categories, products, banners, heroContent, siteSettings, users, loading,
+    fetchData, addBanner, deleteBanner, updateHeroContent, updateSiteSettings,
+    addProduct, updateProduct, deleteProduct,
+    addCategory, updateCategory, deleteCategory,
+    addUser, updateUser, deleteUser,
   };
 
   return (
