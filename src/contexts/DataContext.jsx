@@ -131,7 +131,7 @@ export const DataProvider = ({ children }) => {
   const addUser = async (userData) => {
     const response = await fetch(`${BASE_API_URL}/users.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
     const result = await response.json();
-    if (response.ok) fetchData();x
+    if (response.ok) fetchData();
     return { success: response.ok, ...result };
   };
 
