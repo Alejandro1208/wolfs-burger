@@ -141,6 +141,19 @@ export const DataProvider = ({ children }) => {
         });
         return handleApiResponse(response);
     };
+    const updateCategoryOrder = async (orderedIds) => {
+        const formData = new FormData();
+        formData.append("action", "reorder");
+        orderedIds.forEach((id) => {
+            formData.append("orderedIds[]", id);
+        });
+
+        const response = await fetch(`${BASE_API_URL}/categories.php`, {
+            method: "POST",
+            body: formData,
+        });
+        return response.json();
+    };
 
     const deleteCategory = (id) =>
         fetch(`${BASE_API_URL}/categories.php`, {
@@ -189,6 +202,7 @@ export const DataProvider = ({ children }) => {
         addCategory,
         updateCategory,
         deleteCategory,
+        updateCategoryOrder,
         addUser,
         updateUser,
         deleteUser,

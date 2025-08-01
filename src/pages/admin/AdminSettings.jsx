@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, CheckCircle, Image as ImageIcon, HelpCircle, Phone } from 'lucide-react';
+import { Save, CheckCircle, Image as ImageIcon, HelpCircle, Phone, ShoppingCart } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
 const AdminSettings = () => {
@@ -24,6 +24,9 @@ const AdminSettings = () => {
         Maps_url: siteSettings.Maps_url || '',
         footer_description: siteSettings.footer_description || '',
         footer_copyright: siteSettings.footer_copyright || '',
+        pedidosya_button_bg: siteSettings.pedidosya_button_bg || '#EA1D2C',
+        pedidosya_button_text_color: siteSettings.pedidosya_button_text_color || '#FFFFFF',
+        pedidosya_button_icon: siteSettings.pedidosya_button_icon || '',
       });
       setLogoPreview(siteSettings.site_logo_url || '');
     }
@@ -80,6 +83,8 @@ const AdminSettings = () => {
       <div className="bg-white shadow rounded-lg">
         <form onSubmit={handleSubmit} className="p-6 space-y-6 divide-y divide-gray-200">
           
+          {/* ... (Las secciones de Logo, Contacto, Ubicación, etc., se mantienen sin cambios) ... */}
+
           <div className="pt-0">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Logo del Sitio</h2>
             <div className="flex items-center gap-4">
@@ -154,7 +159,52 @@ const AdminSettings = () => {
             </div>
           </div>
 
-
+          {/* --- NUEVA SECCIÓN PARA PERSONALIZAR EL BOTÓN --- */}
+          <div className="pt-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+              <ShoppingCart size={18} /> Botón de Pedido
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+              {/* Controles */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <input type="color" name="pedidosya_button_bg" value={formData.pedidosya_button_bg} onChange={handleInputChange} className="w-10 h-10 rounded-full border-gray-300" />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Color de Fondo</label>
+                  </div>
+                </div>
+                  <div className="flex items-center gap-4">
+                  <input type="color" name="pedidosya_button_text_color" value={formData.pedidosya_button_text_color} onChange={handleInputChange} className="w-10 h-10 rounded-full border-gray-300" />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Color de Texto</label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Ícono (SVG)</label>
+                  <textarea name="pedidosya_button_icon" value={formData.pedidosya_button_icon} onChange={handleInputChange} className="input-styled mt-1 w-full" rows="3" placeholder="Pega el código SVG del ícono aquí"></textarea>
+                  <p className="text-xs text-gray-500 mt-1">Busca un ícono en <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">lucide.dev</a>, haz clic en "Copy SVG" y pégalo aquí.</p>
+                </div>
+              </div>
+              {/* Vista Previa */}
+              <div className="bg-gray-100 p-6 rounded-lg flex flex-col items-center justify-center">
+                  <p className="text-sm font-semibold text-gray-600 mb-4">Vista Previa</p>
+                  <a 
+                    style={{ 
+                        backgroundColor: formData.pedidosya_button_bg, 
+                        color: formData.pedidosya_button_text_color 
+                    }}
+                    className="font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex items-center gap-2"
+                  >
+                    <span 
+                      style={{ color: formData.pedidosya_button_text_color }} 
+                      dangerouslySetInnerHTML={{ __html: formData.pedidosya_button_icon }} 
+                    />
+                    <span>Pedir Ahora</span>
+                  </a>
+              </div>
+            </div>
+          </div>
+          
           <div className="pt-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Textos del Pie de Página</h2>
             <div className="space-y-4">
@@ -168,7 +218,7 @@ const AdminSettings = () => {
               </div>
             </div>
           </div>
-
+          
           <div className="flex justify-end pt-6">
             <button
               type="submit"

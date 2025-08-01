@@ -1,13 +1,17 @@
 <?php
 require_once 'db_connection.php';
 
-// Habilitar la visualización de errores para depuración
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method == 'POST' && isset($_POST['_method'])) {
     $method = strtoupper($_POST['_method']);
+}
+
+if ($method == 'POST' && isset($_POST['action']) && $_POST['action'] == 'reorder') {
+    handleReorderCategories();
+    return;
 }
 
 switch ($method) {
@@ -31,7 +35,7 @@ switch ($method) {
 
 function handleGetCategories() {
     $conn = getDbConnection();
-    $result = $conn->query("SELECT id, name, description, image_url FROM categories ORDER BY id ASC");
+    $result = $conn->query("SELECT id, name, description, image_url, order_index FROM categories ORDER BY order_index ASC");
     $categories = [];
     if ($result) {
         while($row = $result->fetch_assoc()) {
@@ -47,6 +51,34 @@ function handleGetCategories() {
     echo json_encode($categories);
     $conn->close();
 }
+
+function handleReorderCategories() {
+    $conn = getDbConnection();
+    $orderedIds = $_POST['orderedIds'] ?? [];
+
+    if (empty($orderedIds) || !is_array($orderedIds)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'No se proporcionó un orden válido.']);
+        return;
+    }
+
+    $stmt = $conn->prepare("UPDATE categories SET order_index = ? WHERE id = ?");
+    foreach ($orderedIds as $index => $id) {
+        $order = $index + 1;
+        $stmt->bind_param("ii", $order, $id);
+        $stmt->execute();
+    }
+
+    if ($stmt->error) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Error al actualizar el orden.']);
+    } else {
+        echo json_encode(['success' => true]);
+    }
+    $stmt->close();
+    $conn->close();
+}
+
 
 function handleSaveCategory() {
     $conn = getDbConnection();
@@ -70,14 +102,11 @@ function handleSaveCategory() {
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-
         if ($id && $image_path_for_db && file_exists($image_path_for_db)) {
             unlink($image_path_for_db);
         }
-
         $fileName = 'cat_' . time() . '-' . basename($_FILES['image']['name']);
         $uploadPath = $uploadDir . $fileName;
-
         if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
             $image_path_for_db = $uploadPath;
         } else {
@@ -89,8 +118,12 @@ function handleSaveCategory() {
         $stmt = $conn->prepare("UPDATE categories SET name = ?, description = ?, image_url = ? WHERE id = ?");
         $stmt->bind_param("sssi", $name, $description, $image_path_for_db, $id);
     } else {
-        $stmt = $conn->prepare("INSERT INTO categories (name, description, image_url) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $name, $description, $image_path_for_db);
+        $result = $conn->query("SELECT MAX(order_index) as max_order FROM categories");
+        $max_order = $result->fetch_assoc()['max_order'] ?? 0;
+        $new_order_index = $max_order + 1;
+
+        $stmt = $conn->prepare("INSERT INTO categories (name, description, image_url, order_index) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sssi", $name, $description, $image_path_for_db, $new_order_index);
     }
 
     if ($stmt->execute()) {

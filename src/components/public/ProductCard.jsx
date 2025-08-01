@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import pedidosyaLogo from '../../assets/pedidosya-logo.png';
+import { useData } from '../../contexts/DataContext';
 
 const ProductCard = ({ product }) => {
+  const { siteSettings } = useData();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = (e) => {
@@ -56,12 +57,30 @@ const ProductCard = ({ product }) => {
         <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-semibold mb-2 self-start">{product.category_name}</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
         <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow line-clamp-3">{product.description}</p>
-        <div className="flex items-center justify-between mt-auto">
-          <div className="text-2xl font-bold text-primary">{formatPrice(product.price)}</div>
+        
+        <div className="mt-auto pt-4 space-y-3">
+          <div className="text-2xl font-bold text-primary text-right">
+            {formatPrice(product.price)}
+          </div>
+          
           {product.pedidosya_link && (
-            <a href={product.pedidosya_link} target="_blank" rel="noopener noreferrer" className="bg-[#ec2f42] hover:bg-[#c5273a] text-white font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex-shrink-0">
-              <span className="block text-xs">Pedir en</span>
-              <img src={pedidosyaLogo} alt="PedidosYa" className="h-5 w-auto mx-auto" />
+            <a 
+              href={product.pedidosya_link} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              style={{
+                backgroundColor: siteSettings.pedidosya_button_bg,
+                color: siteSettings.pedidosya_button_text_color
+              }}
+              className="font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex items-center justify-center gap-1.5 w-full"
+            >
+              {siteSettings.pedidosya_button_icon && (
+                <span 
+                  style={{ color: siteSettings.pedidosya_button_text_color }}
+                  dangerouslySetInnerHTML={{ __html: siteSettings.pedidosya_button_icon }}
+                />
+              )}
+              <span>Pedir Ahora</span>
             </a>
           )}
         </div>

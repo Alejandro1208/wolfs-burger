@@ -22,7 +22,7 @@ const FloatingButtons = () => {
 
     return (
         <>
-            <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2">
+            <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2" style={{ zIndex: 90 }}>
                 {socialLinks.map((social) => (
                     siteSettings[social.key] && (
                         <a 
