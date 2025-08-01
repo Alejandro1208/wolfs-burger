@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, MapPin } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
-import staticLogo from '../../assets/logo.png'; // 1. Renombramos la importación a 'staticLogo'
 
 const PublicHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,8 +19,7 @@ const PublicHeader = () => {
         <div className="flex justify-between items-center h-24">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              {/* 2. Ahora 'staticLogo' sí existe y funciona como fallback */}
-              <img src={siteSettings.site_logo_url || staticLogo} alt="Wolf's Burger Logo" className="h-20 w-auto" />
+              <img src={siteSettings.site_logo_url || ''} alt="Logo" className="h-20 w-auto" />
             </Link>
           </div>
 

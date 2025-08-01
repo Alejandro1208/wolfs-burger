@@ -1,4 +1,3 @@
-// src/pages/admin/AdminAppearance.jsx
 import React, { useState, useEffect } from 'react';
 import { Save, CheckCircle, Palette } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
@@ -32,7 +31,6 @@ const AdminAppearance = () => {
     setLoading(true);
     setSaved(false);
 
-    // Creamos un FormData porque la función updateSiteSettings lo espera
     const formData = new FormData();
     Object.keys(colors).forEach(key => {
         formData.append(key, colors[key]);
@@ -65,7 +63,6 @@ const AdminAppearance = () => {
       <div className="bg-white shadow rounded-lg">
         <form onSubmit={handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Color Primario */}
             <div className="flex items-center gap-4">
               <input type="color" name="color_primary" value={colors.color_primary} onChange={handleColorChange} className="w-12 h-12 rounded-full border-gray-300" />
               <div>
@@ -73,7 +70,6 @@ const AdminAppearance = () => {
                 <p className="text-xs text-gray-500">Usado en fondos y botones principales.</p>
               </div>
             </div>
-            {/* Color Secundario */}
             <div className="flex items-center gap-4">
               <input type="color" name="color_secondary" value={colors.color_secondary} onChange={handleColorChange} className="w-12 h-12 rounded-full border-gray-300" />
               <div>
@@ -81,7 +77,6 @@ const AdminAppearance = () => {
                 <p className="text-xs text-gray-500">Usado para efectos hover y alertas.</p>
               </div>
             </div>
-            {/* Color de Acento */}
             <div className="flex items-center gap-4">
               <input type="color" name="color_accent" value={colors.color_accent} onChange={handleColorChange} className="w-12 h-12 rounded-full border-gray-300" />
               <div>

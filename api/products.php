@@ -1,12 +1,10 @@
 <?php
-// api/products.php
 require_once 'db_connection.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Para manejar las actualizaciones, usamos un campo _method en el POST
 if ($method == 'POST' && isset($_POST['_method'])) {
     $method = strtoupper($_POST['_method']);
 }
@@ -32,17 +30,14 @@ switch ($method) {
 
 function handleGetProducts() {
     $conn = getDbConnection();
-    // Añadimos 'is_featured' a la consulta SELECT
     $sql = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.id DESC";
     $result = $conn->query($sql);
     $products = [];
 
     if ($result) {
         while ($row = $result->fetch_assoc()) {
-            // Convertimos el valor de la base de datos (0 o 1) a un booleano (false o true)
             $row['is_featured'] = ($row['is_featured'] == 1);
             
-            // Por cada producto, buscamos y adjuntamos sus imágenes
             $images = [];
             $stmt_images = $conn->prepare("SELECT id, image_url FROM product_images WHERE product_id = ? ORDER BY order_index");
             $stmt_images->bind_param("i", $row['id']);

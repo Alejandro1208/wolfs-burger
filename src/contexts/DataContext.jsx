@@ -26,20 +26,20 @@ export const DataProvider = ({ children }) => {
         fetch(`${BASE_API_URL}/hero.php`),
         fetch(`${BASE_API_URL}/getCategorias.php`),
         fetch(`${BASE_API_URL}/settings.php`),
-        fetch(`${BASE_API_URL}/products.php`), // <-- Se añade la petición de productos
+        fetch(`${BASE_API_URL}/products.php`),
       ]);
 
       const bannersData = await bannersRes.json();
       const heroData = await heroRes.json();
       const categoriesData = await categoriesRes.json();
       const settingsData = await settingsRes.json();
-      const productsData = await productsRes.json(); // <-- Se obtienen los datos de productos
+      const productsData = await productsRes.json(); 
       
       setBanners(bannersData || []);
       setHeroContent(heroData || {});
       setCategories(categoriesData || []);
       setSiteSettings(settingsData || {});
-      setProducts(productsData || []); // <-- Se guardan los productos en el estado
+      setProducts(productsData || []); 
 
     } catch (error) {
       console.error("Error fetching data from API:", error);
@@ -52,7 +52,7 @@ export const DataProvider = ({ children }) => {
     fetchData();
   }, []);
 
-  // --- FUNCIONES DE PORTADA (Banners & Hero) ---
+
   const addBanner = async (formData) => {
     const response = await fetch(`${BASE_API_URL}/banners.php`, { method: 'POST', body: formData });
     const result = await response.json();
@@ -73,17 +73,16 @@ export const DataProvider = ({ children }) => {
     if (response.ok && result.success) fetchData();
     return { success: response.ok, ...result };
   };
-  
-  // --- FUNCIONES DE CONFIGURACIÓN GENERAL ---
-  const updateSiteSettings = async (formData) => { // Ahora recibe FormData
+
+  const updateSiteSettings = async (formData) => {
     try {
       const response = await fetch(`${BASE_API_URL}/settings.php`, {
         method: 'POST',
-        body: formData, // No se necesita 'headers', el navegador lo pone automáticamente
+        body: formData,
       });
       const result = await response.json();
       if (response.ok && result.success) {
-        fetchData(); // Recargamos los datos para ver el nuevo logo
+        fetchData(); 
       }
       return { success: response.ok, ...result };
     } catch (error) {
@@ -92,7 +91,6 @@ export const DataProvider = ({ children }) => {
   };
 
 
-  // --- FUNCIONES CRUD PARA PRODUCTOS (NUEVAS) ---
   const addProduct = async (formData) => {
     const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'POST', body: formData });
     const result = await response.json();
@@ -101,7 +99,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateProduct = async (formData) => {
-    formData.append('_method', 'PUT'); // Simulamos un método PUT para la actualización
+    formData.append('_method', 'PUT'); 
     const response = await fetch(`${BASE_API_URL}/products.php`, { method: 'POST', body: formData });
     const result = await response.json();
     if (response.ok && result.success) fetchData();
@@ -115,15 +113,35 @@ export const DataProvider = ({ children }) => {
     return { success: response.ok, ...result };
   };
 
+    const addCategory = async (formData) => {
+    const response = await fetch(`${BASE_API_URL}/categories.php`, { method: 'POST', body: formData });
+    const result = await response.json();
+    if (response.ok) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+  const updateCategory = async (formData) => {
+    formData.append('_method', 'PUT');
+    const response = await fetch(`${BASE_API_URL}/categories.php`, { method: 'POST', body: formData });
+    const result = await response.json();
+    if (response.ok) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+  const deleteCategory = async (id) => {
+    const response = await fetch(`${BASE_API_URL}/categories.php`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const result = await response.json();
+    if (response.ok) fetchData();
+    return { success: response.ok, ...result };
+  };
+
   const value = {
-    // Estados
     categories,
     products,
     banners,
     heroContent,
     siteSettings,
     loading,
-    // Funciones
     fetchData,
     addBanner,
     deleteBanner,
@@ -132,6 +150,10 @@ export const DataProvider = ({ children }) => {
     addProduct,
     updateProduct,
     deleteProduct,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+
   };
 
   return (

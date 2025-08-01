@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, CheckCircle, Image as ImageIcon, HelpCircle } from 'lucide-react';
+import { Save, CheckCircle, Image as ImageIcon, HelpCircle, Phone } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
 const AdminSettings = () => {
@@ -19,6 +19,9 @@ const AdminSettings = () => {
         hours: siteSettings.hours || '',
         facebook_url: siteSettings.facebook_url || '',
         instagram_url: siteSettings.instagram_url || '',
+        tiktok_url: siteSettings.tiktok_url || '',
+        youtube_url: siteSettings.youtube_url || '',
+        whatsapp_number: siteSettings.whatsapp_number || '',
         Maps_url: siteSettings.Maps_url || '',
         footer_description: siteSettings.footer_description || '',
         footer_copyright: siteSettings.footer_copyright || '',
@@ -134,8 +137,28 @@ const AdminSettings = () => {
                 <label className="block text-sm font-medium text-gray-700">URL de Instagram</label>
                 <input type="url" name="instagram_url" value={formData.instagram_url || ''} onChange={handleInputChange} className="input-styled"/>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">URL de TikTok</label>
+                <input type="url" name="tiktok_url" value={formData.tiktok_url || ''} onChange={handleInputChange} className="input-styled"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">URL de YouTube</label>
+                <input type="url" name="youtube_url" value={formData.youtube_url || ''} onChange={handleInputChange} className="input-styled"/>
+              </div>
             </div>
           </div>
+          
+          <div className="pt-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+              <Phone size={18}/> Contacto Rápido
+            </h2>
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Número de WhatsApp</label>
+                <input type="text" name="whatsapp_number" value={formData.whatsapp_number || ''} onChange={handleInputChange} className="input-styled" placeholder="54911... (código de país + número)"/>
+                <p className="text-xs text-gray-500 mt-1">Incluir código de país y área, sin el símbolo '+' ni espacios. Ejemplo: 5491122334455</p>
+            </div>
+          </div>
+
 
           <div className="pt-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Textos del Pie de Página</h2>
@@ -173,7 +196,6 @@ const AdminSettings = () => {
         </form>
       </div>
 
-      {/* BLOQUE DE INSTRUCCIONES RESTAURADO */}
       <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
         <h3 className="text-sm font-medium text-blue-800 mb-2 flex items-center gap-2">
           <HelpCircle size={16}/> ¿Cómo obtener la URL de Google Maps?

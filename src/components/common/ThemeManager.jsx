@@ -1,8 +1,6 @@
-// src/components/common/ThemeManager.jsx
 import { useEffect } from 'react';
 import { useData } from '../../contexts/DataContext';
 
-// Función para convertir HEX a R G B
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}` : null;
@@ -22,6 +20,7 @@ const ThemeManager = () => {
     if (siteSettings.color_accent) {
       root.style.setProperty('--color-accent', hexToRgb(siteSettings.color_accent));
     }
+    document.body.style.opacity = 1;
   }, [siteSettings]);
 
   return null; // Este componente no renderiza nada

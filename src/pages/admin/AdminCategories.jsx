@@ -1,44 +1,101 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X, Folder } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Folder, Image as ImageIcon } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
+// Componente para el formulario, lo ponemos en el mismo archivo para simplificar
+const CategoryForm = ({ category, onClose }) => {
+    const { addCategory, updateCategory } = useData();
+    const [name, setName] = useState(category?.name || '');
+    const [description, setDescription] = useState(category?.description || '');
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(category?.image_url || '');
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if(file) {
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name.trim()) return;
+        setIsProcessing(true);
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        } else if (category?.image_url) {
+            const relativePath = category.image_url.split('/api/')[1];
+            formData.append('existing_image_url', relativePath);
+        }
+
+        if (category) {
+            formData.append('id', category.id);
+            await updateCategory(formData);
+        } else {
+            await addCategory(formData);
+        }
+        setIsProcessing(false);
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4" style={{ marginTop: 0 }}>
+            <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b">
+                    <h2 className="text-xl font-semibold">{category ? 'Editar Categoría' : 'Nueva Categoría'}</h2>
+                    <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-gray-200"><X size={20}/></button>
+                </div>
+                <form onSubmit={handleSubmit} id="category-form" className="p-6 space-y-4 overflow-y-auto">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Imagen</label>
+                        <div className="mt-2 flex items-center gap-4">
+                            <div className="w-24 h-24 rounded-md bg-gray-100 overflow-hidden flex items-center justify-center">
+                                {imagePreview ? <img src={imagePreview} alt="Preview" className="w-full h-full object-cover"/> : <ImageIcon className="text-gray-400"/>}
+                            </div>
+                            <label htmlFor="cat-image-upload" className="btn-secondary cursor-pointer">
+                                Subir Imagen
+                                <input id="cat-image-upload" type="file" className="hidden" onChange={handleImageChange} accept="image/*"/>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Nombre *</label>
+                        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input-styled w-full"/>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Descripción</label>
+                        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-styled w-full" rows="3"></textarea>
+                    </div>
+                </form>
+                <div className="flex justify-end gap-3 p-4 border-t bg-gray-50">
+                    <button type="button" onClick={onClose} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm">Cancelar</button>
+                    <button type="submit" form="category-form" disabled={isProcessing} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md">
+                        {isProcessing ? 'Guardando...' : 'Guardar'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 const AdminCategories = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, loading } = useData();
-  const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [currentName, setCurrentName] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { categories, deleteCategory, loading } = useData();
+  const [showForm, setShowForm] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
-  const handleStartAdd = () => {
-    setIsAdding(true);
-    setCurrentName('');
-    setEditingId(null);
+  const handleOpenForm = (category = null) => {
+    setEditingCategory(category);
+    setShowForm(true);
   };
-
-  const handleStartEdit = (category) => {
-    setEditingId(category.id);
-    setCurrentName(category.name);
-    setIsAdding(false);
-  };
-
-  const handleCancel = () => {
-    setIsAdding(false);
-    setEditingId(null);
-    setCurrentName('');
-  };
-
-  const handleSave = async () => {
-    if (!currentName.trim()) return;
-    setIsProcessing(true);
-    if (isAdding) {
-      await addCategory({ name: currentName });
-    }
-    if (editingId) {
-      await updateCategory({ id: editingId, name: currentName });
-    }
-    setIsProcessing(false);
-    handleCancel();
-  };
+  
+  const handleCloseForm = () => setShowForm(false);
 
   const handleDelete = async (id) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
@@ -53,68 +110,38 @@ const AdminCategories = () => {
           <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
           <p className="mt-2 text-gray-600">Crea, edita y elimina las categorías de tus productos.</p>
         </div>
-        <button onClick={handleStartAdd} disabled={isAdding || editingId} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2 disabled:opacity-50">
+        <button onClick={() => handleOpenForm()} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2">
           <Plus size={16}/>Nueva Categoría
         </button>
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="divide-y divide-gray-200">
-          {isAdding && (
-            <div className="p-4 flex items-center gap-4 bg-indigo-50">
-              <Folder size={20} className="text-indigo-500 flex-shrink-0" />
-              <input
-                type="text"
-                value={currentName}
-                onChange={(e) => setCurrentName(e.target.value)}
-                placeholder="Nombre de la nueva categoría"
-                className="input-styled flex-grow"
-                autoFocus
-              />
-              <button onClick={handleSave} disabled={isProcessing || !currentName.trim()} className="p-2 text-green-600 hover:bg-green-100 rounded-md transition-colors"><Save size={18}/></button>
-              <button onClick={handleCancel} className="p-2 text-gray-500 hover:bg-gray-200 rounded-md transition-colors"><X size={18}/></button>
-            </div>
-          )}
-
           {categories.map((category) => (
             <div key={category.id} className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
-              <Folder size={20} className="text-gray-400 flex-shrink-0" />
+              <div className="w-16 h-16 rounded-md bg-gray-100 overflow-hidden flex-shrink-0">
+                {category.image_url ? <img src={category.image_url} alt={category.name} className="w-full h-full object-cover"/> : <Folder size={24} className="text-gray-400 m-auto"/>}
+              </div>
               <div className="flex-grow">
-                {editingId === category.id ? (
-                  <input
-                    type="text"
-                    value={currentName}
-                    onChange={(e) => setCurrentName(e.target.value)}
-                    className="input-styled w-full"
-                    autoFocus
-                  />
-                ) : (
-                  <p className="text-sm font-medium text-gray-900">{category.name}</p>
-                )}
+                  <p className="font-semibold text-gray-900">{category.name}</p>
+                  <p className="text-sm text-gray-500 line-clamp-2">{category.description}</p>
               </div>
               <div className="flex items-center gap-2">
-                {editingId === category.id ? (
-                  <>
-                    <button onClick={handleSave} disabled={isProcessing || !currentName.trim()} className="p-2 text-green-600 hover:bg-green-100 rounded-md transition-colors"><Save size={18}/></button>
-                    <button onClick={handleCancel} className="p-2 text-gray-500 hover:bg-gray-200 rounded-md transition-colors"><X size={18}/></button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => handleDelete(category.id)} disabled={isAdding || editingId} className="p-2 text-gray-500 hover:text-red-600 rounded-md transition-colors disabled:opacity-50" title="Eliminar"><Trash2 size={16}/></button>
-                    <button onClick={() => handleStartEdit(category)} disabled={isAdding || editingId} className="p-2 text-gray-500 hover:text-indigo-600 rounded-md transition-colors disabled:opacity-50" title="Editar"><Edit size={16}/></button>
-                  </>
-                )}
+                <button onClick={() => handleDelete(category.id)} className="p-2 text-gray-500 hover:text-red-600 rounded-md" title="Eliminar"><Trash2 size={16}/></button>
+                <button onClick={() => handleOpenForm(category)} className="p-2 text-gray-500 hover:text-indigo-600 rounded-md" title="Editar"><Edit size={16}/></button>
               </div>
             </div>
           ))}
         </div>
-        {loading && <p className="text-center py-4 text-gray-500">Cargando...</p>}
-        {!loading && categories.length === 0 && !isAdding && (
-            <div className="text-center py-12">
-                <p className="text-gray-500">No hay categorías. ¡Crea la primera!</p>
-            </div>
+        {loading && <p className="text-center py-4">Cargando...</p>}
+        {!loading && categories.length === 0 && (
+            <div className="text-center py-12"><p className="text-gray-500">No hay categorías. ¡Crea la primera!</p></div>
         )}
       </div>
+      
+      {showForm && (
+          <CategoryForm category={editingCategory} onClose={handleCloseForm} />
+      )}
     </div>
   );
 };

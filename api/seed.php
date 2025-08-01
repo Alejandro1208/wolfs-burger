@@ -1,32 +1,24 @@
 <?php
-// Incluir el archivo de conexión a la base de datos
 require_once 'db_connection.php';
 
-// Establecer un límite de tiempo más largo para la ejecución, por si acaso
 set_time_limit(60);
 
-// Mensaje de estado
 echo "<h1>Ejecutando Seeder...</h1>";
 
 try {
-    // Obtener la conexión a la base de datos
     $conn = getDbConnection();
 
-    // --- PASO 1: Desactivar revisión de claves foráneas para la limpieza ---
     $conn->query('SET FOREIGN_KEY_CHECKS=0;');
     echo "<p>Revisión de claves foráneas desactivada.</p>";
 
-    // --- PASO 2: Vaciar las tablas ---
     $conn->query('TRUNCATE TABLE `products`;');
     echo "<p>Tabla 'products' vaciada con éxito.</p>";
     $conn->query('TRUNCATE TABLE `categories`;');
     echo "<p>Tabla 'categories' vaciada con éxito.</p>";
 
-    // --- PASO 3: Reactivar revisión de claves foráneas ---
     $conn->query('SET FOREIGN_KEY_CHECKS=1;');
     echo "<p>Revisión de claves foráneas reactivada.</p>";
 
-    // --- PASO 4: Insertar las categorías ---
     $categories = [
         'Hamburguesas',
         'Bebidas',

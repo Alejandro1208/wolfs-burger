@@ -1,5 +1,4 @@
 <?php
-// api/hero.php (NUEVO ARCHIVO)
 ini_set('display_errors', 1); error_reporting(E_ALL);
 require_once 'db_connection.php';
 $method = $_SERVER['REQUEST_METHOD'];
@@ -19,7 +18,6 @@ switch ($method) {
 
 function handleGetHero() {
     $conn = getDbConnection();
-    // Siempre obtenemos la primera (y única) fila
     $result = $conn->query("SELECT * FROM hero_content WHERE id = 1");
     $hero_content = null;
     if ($result) {

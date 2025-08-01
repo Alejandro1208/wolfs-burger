@@ -1,7 +1,6 @@
 import React from 'react';
 import { MapPin, Phone, Clock, Facebook, Instagram, Mail } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
-import staticLogo from '../../assets/logo.png';
 
 const PublicFooter = () => {
   const { siteSettings } = useData();
@@ -14,19 +13,16 @@ const PublicFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="mb-4">
-              <img 
-                src={siteSettings.site_logo_url || staticLogo} 
-                alt="Wolf's Burger Logo" 
-                className="h-24 w-auto"
-              />
+              <img src={siteSettings.site_logo_url || ''} alt="Logo" className="h-24 w-auto" />
             </div>
-            {/* TEXTO DE DESCRIPCIÓN DINÁMICO */}
             <p className="text-gray-300 mb-4">
-              {siteSettings.footer_description || 'Las mejores hamburguesas artesanales de la ciudad. Ingredientes frescos, sabores únicos y la mejor atención.'}
+              {siteSettings.footer_description}
             </p>
             <div className="flex space-x-4">
-              <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary transition-colors"><Facebook className="h-6 w-6" /></a>
-              <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary transition-colors"><Instagram className="h-6 w-6" /></a>
+              {siteSettings.facebook_url && <a href={siteSettings.facebook_url} /* ... */><Facebook/></a>}
+              {siteSettings.instagram_url && <a href={siteSettings.instagram_url} /* ... */><Instagram/></a>}
+              {siteSettings.tiktok_url && <a href={siteSettings.tiktok_url} /* ... */><TikTokIcon /></a>}
+              {siteSettings.youtube_url && <a href={siteSettings.youtube_url} /* ... */><Youtube/></a>}
             </div>
           </div>
 
@@ -58,13 +54,16 @@ const PublicFooter = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          {/* TEXTO DE COPYRIGHT DINÁMICO */}
           <p className="text-gray-400">
-            {siteSettings.footer_copyright || '© 2024 Wolf\'s Burger. Todos los derechos reservados.'}
+            {siteSettings.footer_copyright}
           </p>
         </div>
       </div>
     </footer>
   );
 };
+
+const TikTokIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+);
 export default PublicFooter;

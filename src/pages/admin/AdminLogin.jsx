@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import staticLogo from '../../assets/logo.png';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [dynamicLogo, setDynamicLogo] = useState(staticLogo); // Estado para el logo
+  const [dynamicLogo, setDynamicLogo] = useState('');
   const { login, isAuthenticated } = useAuth();
 
-  // Este efecto busca el logo dinámico al cargar la página
   useEffect(() => {
     fetch('https://alejandrosabater.com.ar/api/settings.php')
       .then(res => res.json())
@@ -44,8 +42,7 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-primary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          {/* Ahora usamos el logo del estado, que puede ser dinámico o el de respaldo */}
-          <img src={dynamicLogo} alt="Wolf's Burger Logo" className="mx-auto h-24 w-auto" />
+          {dynamicLogo && <img src={dynamicLogo} alt="Logo" className="mx-auto h-24 w-auto" />}
           <h2 className="mt-6 text-3xl font-bold text-white">Panel de Administración</h2>
           <p className="mt-2 text-lg text-brand-cream">Wolf's Burger</p>
         </div>

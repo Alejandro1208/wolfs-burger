@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
+const BASE_API_URL = 'https://alejandrosabater.com.ar/api';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -11,53 +12,46 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in (check localStorage or make API call)
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      // In a real app, validate token with API
-      setIsAuthenticated(true);
-      setUser({ email: 'admin@burgers.com' });
+    const storedUser = localStorage.getItem('admin_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
     try {
-      // This would be replaced with actual API call to PHP backend
-      // const response = await fetch('/api/admin/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
+      const response = await fetch(`${BASE_API_URL}/login.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
       
-      // Mock login for demo
-      if (email === 'admin@burgers.com' && password === 'admin123') {
-        const mockToken = 'mock-jwt-token';
-        localStorage.setItem('admin_token', mockToken);
-        setIsAuthenticated(true);
-        setUser({ email });
+      const result = await response.json();
+      
+      if (result.success) {
+        setUser(result.user);
+        localStorage.setItem('admin_user', JSON.stringify(result.user));
         return { success: true };
       } else {
-        return { success: false, error: 'Credenciales inválidas' };
+        return { success: false, error: result.error || 'Credenciales inválidas' };
       }
     } catch (error) {
-      return { success: false, error: 'Error de conexión' };
+      return { success: false, error: 'Error de conexión con el servidor.' };
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('admin_token');
-    setIsAuthenticated(false);
     setUser(null);
+    localStorage.removeItem('admin_user');
   };
 
   const value = {
-    isAuthenticated,
+    isAuthenticated: !!user,
     user,
     login,
     logout,

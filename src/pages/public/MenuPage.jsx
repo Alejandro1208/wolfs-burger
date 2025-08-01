@@ -8,7 +8,6 @@ const MenuPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Reordenamos las categorías según el orden deseado
   const orderedCategories = useMemo(() => {
     const order = ["Combos", "Hamburguesas", "Papas", "Bebidas"];
     return categories.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
@@ -53,7 +52,7 @@ const MenuPage = () => {
                 className={`px-6 py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-md ${
                   selectedCategory === category.id
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200' // <-- CORRECCIÓN AQUÍ
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200' 
                 }`}
               >
                 {category.name}

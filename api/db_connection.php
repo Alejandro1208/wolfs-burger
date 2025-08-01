@@ -1,5 +1,4 @@
 <?php
-// api/db_connection.php
 define('DB_HOST', 'localhost');
 define('DB_USER', 'ale287_wolfs-usuario');
 define('DB_PASS', 'Giovanni2906.');

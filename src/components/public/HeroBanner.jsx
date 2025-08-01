@@ -32,7 +32,7 @@ const HeroBanner = () => {
               </div>
             ))
         ) : (
-            <div className="absolute inset-0 bg-gray-700"></div> // Fondo si no hay imágenes
+            <div className="absolute inset-0 bg-gray-700"></div>
         )}
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       </div>
