@@ -20,7 +20,6 @@ const AdminSettings = () => {
         facebook_url: siteSettings.facebook_url || '',
         instagram_url: siteSettings.instagram_url || '',
         tiktok_url: siteSettings.tiktok_url || '',
-        youtube_url: siteSettings.youtube_url || '',
         whatsapp_number: siteSettings.whatsapp_number || '',
         Maps_url: siteSettings.Maps_url || '',
         footer_description: siteSettings.footer_description || '',
@@ -140,10 +139,6 @@ const AdminSettings = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">URL de TikTok</label>
                 <input type="url" name="tiktok_url" value={formData.tiktok_url || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">URL de YouTube</label>
-                <input type="url" name="youtube_url" value={formData.youtube_url || ''} onChange={handleInputChange} className="input-styled"/>
               </div>
             </div>
           </div>

@@ -22,7 +22,6 @@ const PublicFooter = () => {
               {siteSettings.facebook_url && <a href={siteSettings.facebook_url} /* ... */><Facebook/></a>}
               {siteSettings.instagram_url && <a href={siteSettings.instagram_url} /* ... */><Instagram/></a>}
               {siteSettings.tiktok_url && <a href={siteSettings.tiktok_url} /* ... */><TikTokIcon /></a>}
-              {siteSettings.youtube_url && <a href={siteSettings.youtube_url} /* ... */><Youtube/></a>}
             </div>
           </div>
 
@@ -64,6 +63,6 @@ const PublicFooter = () => {
 };
 
 const TikTokIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+  <svg fill="#FFFFFF" xmlns="http://www.w3.org/2000/svg"  viewBox="7 1 50 60" width="20px" height="20px"><path d="M40.227,12C51.146,12,52,12.854,52,23.773v16.453C52,51.145,51.146,52,40.227,52H23.773C12.855,52,12,51.145,12,40.227	V23.773C12,12.854,12.855,12,23.773,12H40.227z M42.732,29.737v-4.196c0,0-2.218,0.011-4.091-1.705	c-1.574-1.442-1.705-4.143-1.705-4.143h-4.196c0,0,0,14.318,0,16.6c0,2.281-1.985,3.462-3.409,3.462	c-1.073,0-3.514-0.841-3.514-3.488c0-2.778,2.806-3.488,3.54-3.488c0.734,0,1.023,0.157,1.023,0.157v-4.429	c0,0-0.682-0.065-1.18-0.082c-4.235-0.143-7.736,3.657-7.736,7.841c0,3.535,2.765,7.815,7.815,7.815	c5.379,0,7.841-4.486,7.841-7.789c0-2.413,0-8.234,0-8.234s1.547,0.865,2.806,1.259C41.185,29.711,42.732,29.737,42.732,29.737z"/></svg>
 );
 export default PublicFooter;
