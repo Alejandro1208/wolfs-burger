@@ -44,7 +44,6 @@ const AdminLogin = () => {
         <div className="text-center">
           {dynamicLogo && <img src={dynamicLogo} alt="Logo" className="mx-auto h-24 w-auto" />}
           <h2 className="mt-6 text-3xl font-bold text-white">Panel de Administración</h2>
-          <p className="mt-2 text-lg text-brand-cream">Wolf's Burger</p>
         </div>
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

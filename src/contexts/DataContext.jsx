@@ -18,15 +18,17 @@ export const DataProvider = ({ children }) => {
   const [heroContent, setHeroContent] = useState({});
   const [siteSettings, setSiteSettings] = useState({});
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
 
   const fetchData = async () => {
     try {
-      const [bannersRes, heroRes, categoriesRes, settingsRes, productsRes] = await Promise.all([
+      const [bannersRes, heroRes, categoriesRes, settingsRes, productsRes, usersRes] = await Promise.all([
         fetch(`${BASE_API_URL}/banners.php`),
         fetch(`${BASE_API_URL}/hero.php`),
         fetch(`${BASE_API_URL}/getCategorias.php`),
         fetch(`${BASE_API_URL}/settings.php`),
         fetch(`${BASE_API_URL}/products.php`),
+        fetch(`${BASE_API_URL}/users.php`), 
       ]);
 
       const bannersData = await bannersRes.json();
@@ -34,12 +36,14 @@ export const DataProvider = ({ children }) => {
       const categoriesData = await categoriesRes.json();
       const settingsData = await settingsRes.json();
       const productsData = await productsRes.json(); 
+      const usersData = await usersRes.json();
       
       setBanners(bannersData || []);
       setHeroContent(heroData || {});
       setCategories(categoriesData || []);
       setSiteSettings(settingsData || {});
       setProducts(productsData || []); 
+      setUsers(usersData || []);
 
     } catch (error) {
       console.error("Error fetching data from API:", error);
@@ -135,6 +139,28 @@ export const DataProvider = ({ children }) => {
     return { success: response.ok, ...result };
   };
 
+  const addUser = async (userData) => {
+    const response = await fetch(`${BASE_API_URL}/users.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
+    const result = await response.json();
+    if (response.ok) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+  const updateUser = async (userData) => {
+    const response = await fetch(`${BASE_API_URL}/users.php`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
+    const result = await response.json();
+    if (response.ok) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+  const deleteUser = async (id) => {
+    const response = await fetch(`${BASE_API_URL}/users.php`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const result = await response.json();
+    if (response.ok) fetchData();
+    return { success: response.ok, ...result };
+  };
+
+
   const value = {
     categories,
     products,
@@ -153,6 +179,10 @@ export const DataProvider = ({ children }) => {
     addCategory,
     updateCategory,
     deleteCategory,
+    users,
+    addUser,
+    updateUser,
+    deleteUser,
 
   };
 
