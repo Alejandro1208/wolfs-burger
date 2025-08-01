@@ -34,8 +34,8 @@ function handleGetCategories() {
             if (!empty($row['image_url'])) {
                 $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
                 $host = $_SERVER['HTTP_HOST'];
-                $basePath = dirname($_SERVER['PHP_SELF']);
-                $row['image_url'] = rtrim("$scheme://$host$basePath", '/') . '/' . ltrim($row['image_url'], '/');
+                $basePath = substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/'));
+                $row['image_url'] = "$scheme://$host$basePath/" . $row['image_url'];
             }
             $categories[] = $row;
         }
@@ -57,13 +57,11 @@ function handleCreateOrUpdateCategory() {
     $image_path_for_db = $_POST['existing_image_url'] ?? null;
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDirRelative = 'uploads/categories/';
-        $uploadDirAbsolute = $_SERVER['DOCUMENT_ROOT'] . '/' . $uploadDirRelative;
-        
-        if (!is_dir($uploadDirAbsolute)) {
-            if (!mkdir($uploadDirAbsolute, 0755, true)) {
-                http_response_code(500); echo json_encode(['error' => 'No se pudo crear el directorio de subida.']); return;
-            }
+        // --- CAMBIO CLAVE AQUÍ ---
+        // Usamos rutas relativas, igual que en products.php
+        $uploadDir = 'uploads/categories/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
 
         if ($id) {
@@ -71,18 +69,19 @@ function handleCreateOrUpdateCategory() {
             $stmt_old->bind_param("i", $id);
             $stmt_old->execute();
             $result_old = $stmt_old->get_result()->fetch_assoc();
-            $old_file_path = $_SERVER['DOCUMENT_ROOT'] . '/' . $result_old['image_url'];
-            if ($result_old && !empty($result_old['image_url']) && file_exists($old_file_path)) {
-                unlink($old_file_path);
+            // Usamos la ruta relativa para borrar el archivo viejo
+            if ($result_old && !empty($result_old['image_url']) && file_exists($result_old['image_url'])) {
+                unlink($result_old['image_url']);
             }
         }
         
         $fileName = 'cat_' . time() . '-' . basename($_FILES['image']['name']);
-        $newFileFullPath = $uploadDirAbsolute . $fileName;
-        $image_path_for_db = $uploadDirRelative . $fileName;
+        $uploadPath = $uploadDir . $fileName;
         
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $newFileFullPath)) {
-            http_response_code(500); echo json_encode(['error' => 'No se pudo mover la imagen al directorio. Verifica los permisos.']); return;
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
+            $image_path_for_db = $uploadPath; // Guardamos la ruta relativa
+        } else {
+            http_response_code(500); echo json_encode(['error' => 'No se pudo mover la imagen. Verifica los permisos de la carpeta uploads.']); return;
         }
     }
 
@@ -99,7 +98,7 @@ function handleCreateOrUpdateCategory() {
         echo json_encode(['success' => true, 'id' => $id ? $id : $stmt->insert_id]);
     } else {
         http_response_code(500);
-        echo json_encode(['error' => 'Error al guardar la categoría en la base de datos.']);
+        echo json_encode(['error' => 'Error al guardar la categoría en la base de datos.', 'details' => $stmt->error]);
     }
     $stmt->close();
     $conn->close();
@@ -117,9 +116,8 @@ function handleDeleteCategory() {
     $stmt_old->bind_param("i", $id);
     $stmt_old->execute();
     $result_old = $stmt_old->get_result()->fetch_assoc();
-    $old_file_path = $_SERVER['DOCUMENT_ROOT'] . '/' . $result_old['image_url'];
-    if ($result_old && !empty($result_old['image_url']) && file_exists($old_file_path)) {
-        unlink($old_file_path);
+    if ($result_old && !empty($result_old['image_url']) && file_exists($result_old['image_url'])) {
+        unlink($result_old['image_url']);
     }
 
     $stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
