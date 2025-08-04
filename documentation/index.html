@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolf's Burger - Template Documentation</title>
+    <style>
+        :root {
+            --primary-color: #c0392b;
+            --secondary-color: #2c3e50;
+            --light-gray: #f7f9fa;
+            --text-color: #333;
+            --code-bg: #2d2d2d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+        }
+        .sidebar {
+            width: 260px;
+            background-color: var(--secondary-color);
+            color: white;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .sidebar h2 {
+            margin: 0 0 20px 0;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+            box-sizing: border-box;
+        }
+        section {
+            margin-bottom: 50px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h1, h3, h4 {
+            color: var(--secondary-color);
+        }
+        h1 {
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 15px;
+        }
+        h3 {
+            font-size: 1.8em;
+            margin-top: 0;
+        }
+        h4 {
+            font-size: 1.4em;
+            color: var(--primary-color);
+        }
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .note {
+            background-color: #fffbe6;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .note strong {
+            color: #f39c12;
+        }
+        ol li {
+            margin-bottom: 10px;
+        }
+        strong {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2>Documentation</h2>
+        <nav>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#requirements">2. Server Requirements</a></li>
+                <li><a href="#installation">3. Installation Guide</a></li>
+                <li><a href="#admin-panel">4. Admin Panel Usage</a></li>
+                <li><a href="#credits">5. Credits & Support</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Wolf's Burger - Website Template</h1>
+        </header>
+
+        <section id="introduction">
+            <h3>1. Introduction</h3>
+            <p>Thank you for purchasing the Wolf's Burger website template!</p>
+            <p>This is a complete and self-manageable website solution, perfect for restaurants, cafes, and food businesses. It features a modern frontend built with <strong>React (Vite + TailwindCSS)</strong> and a powerful backend powered by <strong>PHP and MySQL</strong>, allowing you to manage your entire content from a secure admin panel.</p>
+            
+            <h4>Key Features:</h4>
+            <ul>
+                <li>Full Admin Dashboard to manage the site.</li>
+                <li>Product and Category Management.</li>
+                <li>Drag & Drop to reorder categories.</li>
+                <li>Easy customization of website colors.</li>
+                <li>Full control over homepage content, sliders, and buttons.</li>
+                <li>General settings management (logo, contact info, social media, etc.).</li>
+            </ul>
+        </section>
+
+        <section id="requirements">
+            <h3>2. Server Requirements</h3>
+            <p>To run this project, your server must meet the following requirements:</p>
+            <ul>
+                <li><strong>PHP Version:</strong> 8.0 or higher.</li>
+                <li><strong>Database:</strong> MySQL or MariaDB.</li>
+                <li><strong>PHP Extensions:</strong> <code>mysqli</code>, <code>json</code>.</li>
+                <li><strong>Web Server:</strong> Apache or Nginx with <code>mod_rewrite</code> enabled for URL rewriting.</li>
+            </ul>
+        </section>
+
+        <section id="installation">
+            <h3>3. Installation Guide</h3>
+            <p>Please follow these steps carefully to install the website on your server.</p>
+
+            <h4>Step 1: Upload Files</h4>
+            <p>Unzip the main package you downloaded. Inside, you will find the folders <code>api</code> and <code>dist</code>. Upload the contents of both folders to the public directory of your server (e.g., <code>public_html</code> or <code>www</code>).</p>
+            
+            <h4>Step 2: Create a Database</h4>
+            <p>Using your hosting control panel (like cPanel), create a new database. Then, create a new database user and add that user to the database, granting it <strong>All Privileges</strong>. Make sure to save the database name, username, and password.</p>
+
+            <h4>Step 3: Import the Database</h4>
+            <p>In your hosting control panel, find <strong>phpMyAdmin</strong> and select your new database. Click on the <strong>"Import"</strong> tab. Upload the <code>database.sql</code> file included in the package and click "Go". This will create all the necessary tables with default data.</p>
+
+            <h4>Step 4: Configure the Database Connection</h4>
+            <p>On your server, navigate to the <code>api</code> folder and open the file <code>db_connection.php</code> with a text editor.</p>
+            <p>Edit the following lines with your database credentials from Step 2:</p>
+            <pre><code>&lt;?php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'your_database_user');     // &lt;-- CHANGE THIS
+define('DB_PASS', 'your_database_password');  // &lt;-- CHANGE THIS
+define('DB_NAME', 'your_database_name');      // &lt;-- CHANGE THIS
+...
+?&gt;</code></pre>
+
+            <h4>Step 5: Configure the API URL in the Frontend</h4>
+            <div class="note">
+                <strong>CRITICAL STEP:</strong> This step connects the visual part of the site with your database. Do not skip it.
+            </div>
+            <p>Open the file <code>dist/assets/index-....js</code> (the name will have random characters). You must edit this file.</p>
+            <p>Search for the text <code>https://alejandrosabater.com.ar/api</code>.</p>
+            <p><strong>Replace it</strong> with the public URL to your <code>api</code> folder. For example: <code>https://yourdomain.com/api</code>.</p>
+            
+            <h4>Step 6: Access Your Site</h4>
+            <p>That's it! Your website should now be live.</p>
+            <p>To log into the admin panel, go to <code>https://yourdomain.com/admin/login</code>.</p>
+            <p>Default login credentials are:</p>
+            <ul>
+                <li><strong>Email:</strong> <code>admin@wolfs.com</code></li>
+                <li><strong>Password:</strong> <code>admin123</code></li>
+            </ul>
+            <div class="note">
+                <strong>Important:</strong> Please change these credentials immediately after your first login via the "Usuarios" (Users) section!
+            </div>
+        </section>
+
+        <section id="admin-panel">
+            <h3>4. Admin Panel Usage</h3>
+            <p>The admin panel is designed to be intuitive. Here is a brief overview of each section:</p>
+            <ul>
+                <li><strong>Dashboard:</strong> A summary of your site's content.</li>
+                <li><strong>Portada (Homepage):</strong> Manage the background image carousel and the main hero text and buttons.</li>
+                <li><strong>Categorías (Categories):</strong> Create and manage your product categories. You can drag and drop them to change their display order on the site.</li>
+                <li><strong>Productos (Products):</strong> Manage all your products, including names, descriptions, prices, images, and categories.</li>
+                <li><strong>Apariencia (Appearance):</strong> Change the main colors of your website to match your brand.</li>
+                <li><strong>Configuración (Settings):</strong> Update your site's logo, contact details, social media links, Google Maps URL, and footer text.</li>
+                <li><strong>Usuarios (Users):</strong> (Superadmin only) Manage admin users who can access the panel.</li>
+            </ul>
+        </section>
+
+        <section id="credits">
+            <h3>5. Credits & Support</h3>
+            <ul>
+                <li><strong>Icons:</strong> Provided by <a href="https://lucide.dev/" target="_blank">Lucide React</a>.</li>
+                <li><strong>Fonts:</strong> Google Fonts ('Inter').</li>
+            </ul>
+            <p>If you have any issues or questions, please contact me through the support section on the Codester item page. I'll be happy to help!</p>
+        </section>
+    </main>
+
+</body>
+</html>
