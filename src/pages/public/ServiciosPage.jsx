@@ -17,7 +17,7 @@ const ServiciosPage = () => {
     }
 
     return (
-        <div className="bg-white min-h-screen">
+        <div className="min-h-screen bg-gray-50">
             {/* Sección Principal - Contenido editable desde el panel de admin */}
             <div className="bg-gray-900 text-white text-center py-20 px-4">
                 <div className="max-w-4xl mx-auto">
@@ -34,7 +34,7 @@ const ServiciosPage = () => {
             <div className="max-w-7xl mx-auto py-16 px-4">
                 <div className="grid md:grid-cols-3 gap-8">
                     {/* Tarjeta 1 */}
-                    <div className="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
                             {siteSettings.services_card1_title || 'Pista Habilitada y Segura'}
                         </h2>
@@ -44,7 +44,7 @@ const ServiciosPage = () => {
                     </div>
                     
                     {/* Tarjeta 2 */}
-                    <div className="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
                             {siteSettings.services_card2_title || 'Agenda tus Clases a tu Medida'}
                         </h2>
@@ -54,7 +54,7 @@ const ServiciosPage = () => {
                     </div>
                     
                     {/* Tarjeta 3 */}
-                    <div className="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
                             {siteSettings.services_card3_title || 'Clases Particulares con Instructor'}
                         </h2>
@@ -65,8 +65,8 @@ const ServiciosPage = () => {
                 </div>
             </div>
 
-            {/* Nueva Sección para listar las categorías y cursos */}
-            <div className="max-w-7xl mx-auto py-16 px-4">
+            {/* Sección para listar las categorías y cursos */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="text-center mb-12">
                     <h2 className="text-4xl font-bold text-gray-900 mb-8">
                         Nuestros cursos disponibles
@@ -75,14 +75,22 @@ const ServiciosPage = () => {
                 
                 {categories.map(category => (
                     <div key={category.id} className="mb-16">
-                        {/* Título de la categoría y descripción */}
-                        <div className="text-center mb-8">
-                            <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                                {category.name}
-                            </h3>
-                            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                                {category.description}
-                            </p>
+                        {/* Nuevo diseño para la tarjeta de categoría */}
+                        <div className="bg-gray-200 p-8 rounded-lg shadow-md max-w-3xl mx-auto mb-12">
+                            <div className="text-center">
+                                <h3 className="text-3xl font-bold text-gray-900 mb-2">
+                                    {category.name}
+                                </h3>
+                                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                                    {category.description}
+                                </p>
+                                {category.requirements && (
+                                    <div className="mt-6 pt-4 border-t border-gray-400">
+                                        <p className="text-sm font-semibold text-gray-800">Requisitos para Iniciar:</p>
+                                        <div className="text-gray-600" dangerouslySetInnerHTML={{ __html: category.requirements }} />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         
                         {/* Lista de cursos de la categoría */}

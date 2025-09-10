@@ -1,18 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Edit, Trash2, GripVertical, Save, X, Folder, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Edit, Trash2, Save, X, Folder, Image as ImageIcon } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
+// Componente para el formulario, lo ponemos en el mismo archivo para simplificar
 const CategoryForm = ({ category, onClose }) => {
     const { addCategory, updateCategory } = useData();
     const [name, setName] = useState(category?.name || '');
     const [description, setDescription] = useState(category?.description || '');
+    const [requirements, setRequirements] = useState(category?.requirements || '');
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(category?.image_url || '');
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if(file) {
             setImageFile(file);
             setImagePreview(URL.createObjectURL(file));
         }
@@ -26,8 +28,12 @@ const CategoryForm = ({ category, onClose }) => {
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
+        formData.append('requirements', requirements);
         if (imageFile) {
             formData.append('image', imageFile);
+        } else if (category?.image_url) {
+            const relativePath = category.image_url.split('/api/')[1];
+            formData.append('existing_image_url', relativePath);
         }
 
         if (category) {
@@ -68,6 +74,10 @@ const CategoryForm = ({ category, onClose }) => {
                         <label className="block text-sm font-medium text-gray-700">Descripción</label>
                         <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-styled w-full" rows="3"></textarea>
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Requisitos para Iniciar</label>
+                        <textarea value={requirements} onChange={(e) => setRequirements(e.target.value)} className="input-styled w-full" rows="3"></textarea>
+                    </div>
                 </form>
                 <div className="flex justify-end gap-3 p-4 border-t bg-gray-50">
                     <button type="button" onClick={onClose} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm">Cancelar</button>
@@ -80,19 +90,11 @@ const CategoryForm = ({ category, onClose }) => {
     );
 };
 
+
 const AdminCategories = () => {
-  const { categories, deleteCategory, updateCategoryOrder, loading } = useData();
-  const [orderedCategories, setOrderedCategories] = useState([]);
+  const { categories, deleteCategory, loading } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
-  const [isSavingOrder, setIsSavingOrder] = useState(false);
-  
-  const dragItem = useRef();
-  const dragOverItem = useRef();
-
-  useEffect(() => {
-    setOrderedCategories(categories);
-  }, [categories]);
 
   const handleOpenForm = (category = null) => {
     setEditingCategory(category);
@@ -107,61 +109,22 @@ const AdminCategories = () => {
     }
   };
 
-  const handleDragStart = (e, position) => {
-    dragItem.current = position;
-  };
-
-  const handleDragEnter = (e, position) => {
-    dragOverItem.current = position;
-  };
-
-  const handleDrop = (e) => {
-    const copyListItems = [...orderedCategories];
-    const dragItemContent = copyListItems[dragItem.current];
-    copyListItems.splice(dragItem.current, 1);
-    copyListItems.splice(dragOverItem.current, 0, dragItemContent);
-    dragItem.current = null;
-    dragOverItem.current = null;
-    setOrderedCategories(copyListItems);
-  };
-  
-  const handleSaveOrder = async () => {
-    setIsSavingOrder(true);
-    const orderedIds = orderedCategories.map(cat => cat.id);
-    await updateCategoryOrder(orderedIds);
-    setIsSavingOrder(false);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
-          <p className="mt-2 text-gray-600">Arrastra y suelta las categorías para ordenarlas. Luego guarda los cambios.</p>
+          <p className="mt-2 text-gray-600">Crea, edita y elimina las categorías de tus productos.</p>
         </div>
-        <div className="flex gap-4">
-          <button onClick={handleSaveOrder} disabled={isSavingOrder} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md flex items-center gap-2 disabled:opacity-50">
-            <Save size={16}/>{isSavingOrder ? 'Guardando...' : 'Guardar Orden'}
-          </button>
-          <button onClick={() => handleOpenForm()} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md flex items-center gap-2">
-            <Plus size={16}/>Nueva Categoría
-          </button>
-        </div>
+        <button onClick={() => handleOpenForm()} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2">
+          <Plus size={16}/>Nueva Categoría
+        </button>
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="divide-y divide-gray-200">
-          {orderedCategories.map((category, index) => (
-            <div 
-              key={category.id} 
-              className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragEnter={(e) => handleDragEnter(e, index)}
-              onDragEnd={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-            >
-              <GripVertical className="cursor-grab text-gray-400" />
+          {categories.map((category) => (
+            <div key={category.id} className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
               <div className="w-16 h-16 rounded-md bg-gray-100 overflow-hidden flex-shrink-0">
                 {category.image_url ? <img src={category.image_url} alt={category.name} className="w-full h-full object-cover"/> : <Folder size={24} className="text-gray-400 m-auto"/>}
               </div>

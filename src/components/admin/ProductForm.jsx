@@ -33,7 +33,7 @@ const ProductForm = ({ product, onClose }) => {
                 description: product.description || "",
                 price: product.price || "",
                 category_id: product.category_id || "",
-                pedidosya_link: product.pedidosya_link || "",
+                whatsapp_link: product.whatsapp_link || "",
             });
             setIsFeatured(product.is_featured === true);
             setExistingImages(product.images || []);
@@ -191,20 +191,16 @@ const ProductForm = ({ product, onClose }) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Número de WhatsApp (opcional)
+                            Número de WhatsApp
                         </label>
                         <input
                             type="text"
-                            name="whatsapp_link"
-                            value={formData.whatsapp_link}
+                            name="pedidosya_link"
+                            value={formData.pedidosya_link}
                             onChange={handleInputChange}
                             className="input-styled"
-                            placeholder="5491122334455"
+                            placeholder="Ej: 5491122334455"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
-                            Incluir código de país y área, sin el símbolo '+' ni
-                            espacios.
-                        </p>
                     </div>
                     <div className="flex items-center">
                         <input

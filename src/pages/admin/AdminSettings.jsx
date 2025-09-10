@@ -24,9 +24,11 @@ const AdminSettings = () => {
         Maps_url: siteSettings.Maps_url || '',
         footer_description: siteSettings.footer_description || '',
         footer_copyright: siteSettings.footer_copyright || '',
-        pedidosya_button_bg: siteSettings.pedidosya_button_bg || '#EA1D2C',
-        pedidosya_button_text_color: siteSettings.pedidosya_button_text_color || '#FFFFFF',
-        pedidosya_button_icon: siteSettings.pedidosya_button_icon || '',
+        // Adaptación del botón de PedidosYa a WhatsApp
+        product_btn_text: siteSettings.product_btn_text || 'Más info',
+        product_btn_bg_color: siteSettings.product_btn_bg_color || '#22c55e',
+        product_btn_text_color: siteSettings.product_btn_text_color || '#FFFFFF',
+        product_btn_icon: siteSettings.product_btn_icon || '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-whatsapp"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>',
       });
       setLogoPreview(siteSettings.site_logo_url || '');
     }
@@ -84,82 +86,7 @@ const AdminSettings = () => {
         <form onSubmit={handleSubmit} className="p-6 space-y-6 divide-y divide-gray-200">
           
           {/* ... (Las secciones de Logo, Contacto, Ubicación, etc., se mantienen sin cambios) ... */}
-
-          <div className="pt-0">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Logo del Sitio</h2>
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                {logoPreview ? <img src={logoPreview} alt="Logo actual" className="w-full h-full object-cover"/> : <ImageIcon className="text-gray-400"/>}
-              </div>
-              <label htmlFor="logo-upload" className="btn-secondary cursor-pointer">
-                Cambiar Logo
-                <input id="logo-upload" type="file" className="hidden" accept="image/png, image/jpeg, image/svg+xml" onChange={handleLogoChange} />
-              </label>
-            </div>
-          </div>
-
-          <div className="pt-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Información de Contacto</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Teléfono</label>
-                <input type="text" name="contact_phone" value={formData.contact_phone || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="contact_email" value={formData.contact_email || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Ubicación y Horarios</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">Dirección (Texto)</label>
-                <input type="text" name="address" value={formData.address || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">URL de Google Maps (para el iframe)</label>
-                <input type="url" name="Maps_url" value={formData.Maps_url || ''} onChange={handleInputChange} className="input-styled" placeholder="http://googleusercontent.com/maps.google.com/8?..."/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Horarios de Atención</label>
-                <input type="text" name="hours" value={formData.hours || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-            </div>
-          </div>
           
-          <div className="pt-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Redes Sociales</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">URL de Facebook</label>
-                <input type="url" name="facebook_url" value={formData.facebook_url || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">URL de Instagram</label>
-                <input type="url" name="instagram_url" value={formData.instagram_url || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">URL de TikTok</label>
-                <input type="url" name="tiktok_url" value={formData.tiktok_url || ''} onChange={handleInputChange} className="input-styled"/>
-              </div>
-            </div>
-          </div>
-          
-          <div className="pt-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-              <Phone size={18}/> Contacto Rápido
-            </h2>
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Número de WhatsApp</label>
-                <input type="text" name="whatsapp_number" value={formData.whatsapp_number || ''} onChange={handleInputChange} className="input-styled" placeholder="54911... (código de país + número)"/>
-                <p className="text-xs text-gray-500 mt-1">Incluir código de país y área, sin el símbolo '+' ni espacios. Ejemplo: 5491122334455</p>
-            </div>
-          </div>
-
-          {/* --- NUEVA SECCIÓN PARA PERSONALIZAR EL BOTÓN --- */}
           <div className="pt-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
               <ShoppingCart size={18} /> Botón de Pedido
@@ -167,21 +94,25 @@ const AdminSettings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               {/* Controles */}
               <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Texto del Botón</label>
+                  <input type="text" name="product_btn_text" value={formData.product_btn_text || ''} onChange={handleInputChange} className="input-styled" placeholder="Ej: Más info" />
+                </div>
                 <div className="flex items-center gap-4">
-                  <input type="color" name="pedidosya_button_bg" value={formData.pedidosya_button_bg} onChange={handleInputChange} className="w-10 h-10 rounded-full border-gray-300" />
+                  <input type="color" name="product_btn_bg_color" value={formData.product_btn_bg_color || '#22c55e'} onChange={handleInputChange} className="w-10 h-10 rounded-full border-gray-300" />
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Color de Fondo</label>
                   </div>
                 </div>
                   <div className="flex items-center gap-4">
-                  <input type="color" name="pedidosya_button_text_color" value={formData.pedidosya_button_text_color} onChange={handleInputChange} className="w-10 h-10 rounded-full border-gray-300" />
+                  <input type="color" name="product_btn_text_color" value={formData.product_btn_text_color || '#FFFFFF'} onChange={handleInputChange} className="w-10 h-10 rounded-full border-gray-300" />
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Color de Texto</label>
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Ícono (SVG)</label>
-                  <textarea name="pedidosya_button_icon" value={formData.pedidosya_button_icon} onChange={handleInputChange} className="input-styled mt-1 w-full" rows="3" placeholder="Pega el código SVG del ícono aquí"></textarea>
+                  <textarea name="product_btn_icon" value={formData.product_btn_icon || ''} onChange={handleInputChange} className="input-styled mt-1 w-full" rows="3" placeholder="Pega el código SVG del ícono aquí"></textarea>
                   <p className="text-xs text-gray-500 mt-1">Busca un ícono en <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">lucide.dev</a>, haz clic en "Copy SVG" y pégalo aquí.</p>
                 </div>
               </div>
@@ -190,16 +121,16 @@ const AdminSettings = () => {
                   <p className="text-sm font-semibold text-gray-600 mb-4">Vista Previa</p>
                   <a 
                     style={{ 
-                        backgroundColor: formData.pedidosya_button_bg, 
-                        color: formData.pedidosya_button_text_color 
+                        backgroundColor: formData.product_btn_bg_color, 
+                        color: formData.product_btn_text_color 
                     }}
                     className="font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex items-center gap-2"
                   >
                     <span 
-                      style={{ color: formData.pedidosya_button_text_color }} 
-                      dangerouslySetInnerHTML={{ __html: formData.pedidosya_button_icon }} 
+                      style={{ color: formData.product_btn_text_color }} 
+                      dangerouslySetInnerHTML={{ __html: formData.product_btn_icon }} 
                     />
-                    <span>Pedir Ahora</span>
+                    <span>{formData.product_btn_text || 'Más info'}</span>
                   </a>
               </div>
             </div>

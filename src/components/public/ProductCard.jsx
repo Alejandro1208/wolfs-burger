@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 
-const WhatsAppIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-);
-
 const ProductCard = ({ product }) => {
+  const { siteSettings } = useData();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = (e) => {
@@ -25,9 +22,14 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const whatsappUrl = product.whatsapp_link
-    ? `https://wa.me/${product.whatsapp_link}?text=Hola, me interesa el curso "${product.name}".`
+  const whatsappUrl = product.pedidosya_link
+    ? `https://wa.me/${product.pedidosya_link}?text=Hola, me interesa el curso "${product.name}".`
     : '#';
+
+  const buttonText = siteSettings.product_btn_text || 'Más info';
+  const buttonBgColor = siteSettings.product_btn_bg_color || '#22c55e';
+  const buttonTextColor = siteSettings.product_btn_text_color || '#FFFFFF';
+  const buttonIcon = siteSettings.product_btn_icon || '';
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
@@ -54,13 +56,26 @@ const ProductCard = ({ product }) => {
       </div>
 
       <div className="p-4 flex flex-col flex-grow">
+        <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-semibold mb-2 self-start">{product.category_name}</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
         <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow line-clamp-3">{product.description}</p>
-        <div className="flex items-center justify-end mt-auto">
-          {product.whatsapp_link && (
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex items-center gap-2">
-              <WhatsAppIcon/>
-              <span className="block text-sm">Más info</span>
+        
+        <div className="flex justify-end mt-auto">
+          {product.pedidosya_link && (
+            <a 
+                href={whatsappUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                style={{ 
+                    backgroundColor: buttonBgColor,
+                    color: buttonTextColor
+                }}
+                className="font-semibold py-2 px-3 rounded-md text-center transition-colors duration-200 shadow-md flex items-center gap-2"
+            >
+              {buttonIcon && (
+                  <span dangerouslySetInnerHTML={{ __html: buttonIcon }} />
+              )}
+              <span>{buttonText}</span>
             </a>
           )}
         </div>
