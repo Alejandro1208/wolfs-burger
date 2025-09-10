@@ -5,19 +5,20 @@ import { useData } from '../../contexts/DataContext';
 const AdminAppearance = () => {
   const { siteSettings, updateSiteSettings } = useData();
   const [colors, setColors] = useState({
-    color_primary: '#c0392b',
-    color_secondary: '#e74c3c',
-    color_accent: '#f39c12',
+    color_primary: '#0d1e3d',
+    color_secondary: '#226ea5',
+    color_accent: '#e68e24',
   });
+
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (siteSettings) {
       setColors({
-        color_primary: siteSettings.color_primary || '#c0392b',
-        color_secondary: siteSettings.color_secondary || '#e74c3c',
-        color_accent: siteSettings.color_accent || '#f39c12',
+        color_primary: siteSettings.color_primary || '#0d1e3d',
+        color_secondary: siteSettings.color_secondary || '#226ea5',
+        color_accent: siteSettings.color_accent || '#e68e24',
       });
     }
   }, [siteSettings]);

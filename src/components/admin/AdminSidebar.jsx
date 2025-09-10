@@ -7,7 +7,8 @@ import {
   Package, 
   Settings,
   LogOut,
-  Palette 
+  Palette,
+  List
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
@@ -22,6 +23,7 @@ const AdminSidebar = () => {
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Portada', href: '/admin/banners', icon: Image }, 
+    { name: 'Servicios', href: '/admin/services', icon: List },
     { name: 'Categorías', href: '/admin/categories', icon: FolderOpen },
     { name: 'Productos', href: '/admin/products', icon: Package },
     { name: 'Apariencia', href: '/admin/appearance', icon: Palette }, 

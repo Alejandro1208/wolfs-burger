@@ -63,10 +63,10 @@ function handleGetProducts() {
 function handleCreateProduct() {
     $conn = getDbConnection();
     // Añadimos 'is_featured' al INSERT
-    $stmt = $conn->prepare("INSERT INTO products (name, description, price, category_id, pedidosya_link, is_featured) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO products (name, description, price, category_id, whatsapp_link, is_featured) VALUES (?, ?, ?, ?, ?, ?)");
     $is_featured = isset($_POST['is_featured']) && $_POST['is_featured'] == 'true' ? 1 : 0;
-    $stmt->bind_param("ssdisi", $_POST['name'], $_POST['description'], $_POST['price'], $_POST['category_id'], $_POST['pedidosya_link'], $is_featured);
-    
+    $stmt->bind_param("ssdisi", $_POST['name'], $_POST['description'], $_POST['price'], $_POST['category_id'], $_POST['whatsapp_link'], $is_featured);
+
     if ($stmt->execute()) {
         $productId = $stmt->insert_id;
         handleImageUpload($conn, $productId);
@@ -85,9 +85,9 @@ function handleUpdateProduct() {
     $id = $_POST['id'];
 
     // Añadimos 'is_featured' al UPDATE
-    $stmt = $conn->prepare("UPDATE products SET name=?, description=?, price=?, category_id=?, pedidosya_link=?, is_featured=? WHERE id=?");
+    $stmt = $conn->prepare("UPDATE products SET name=?, description=?, price=?, category_id=?, whatsapp_link=?, is_featured=? WHERE id=?");
     $is_featured = isset($_POST['is_featured']) && $_POST['is_featured'] == 'true' ? 1 : 0;
-    $stmt->bind_param("ssdisii", $_POST['name'], $_POST['description'], $_POST['price'], $_POST['category_id'], $_POST['pedidosya_link'], $is_featured, $id);
+    $stmt->bind_param("ssdisii", $_POST['name'], $_POST['description'], $_POST['price'], $_POST['category_id'], $_POST['whatsapp_link'], $is_featured, $id);
     $stmt->execute();
     $stmt->close();
 

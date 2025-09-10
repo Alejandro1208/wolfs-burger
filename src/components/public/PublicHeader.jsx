@@ -8,10 +8,12 @@ const PublicHeader = () => {
   const location = useLocation();
   const { siteSettings } = useData();
 
-  const navigation = [
-    { name: 'Inicio', href: '/' },
-    { name: 'Menú', href: '/menu' },
-  ];
+const navigation = [
+  { name: 'Inicio', href: '/' },
+  { name: 'Servicios', href: '/servicios' },
+  { name: 'Quienes Somos?', href: '/quienes-somos' },
+  { name: 'Contactenos', href: '/contactenos' },
+];
 
   return (
     <header className="bg-base-100 shadow-md sticky top-0 z-50">

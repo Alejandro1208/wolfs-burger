@@ -16,6 +16,9 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminAppearance from './pages/admin/AdminAppearance'; 
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminServices from './pages/admin/AdminServices';
+
+import ServiciosPage from './pages/public/ServiciosPage';
 
 import PublicLayout from './components/layouts/PublicLayout';
 import AdminLayout from './components/layouts/AdminLayout';
@@ -46,6 +49,7 @@ function App() {
           <Routes>
             <Route path="/" element={<PublicLayout />}>
               <Route index element={<HomePage />} />
+              <Route path="servicios" element={<ServiciosPage />} />
               <Route path="menu" element={<MenuPage />} />
             </Route>
 
@@ -57,6 +61,7 @@ function App() {
             }>
               <Route index element={<AdminDashboard />} />
               <Route path="banners" element={<AdminBanners />} />
+              <Route path="services" element={<AdminServices />} />
               <Route path="categories" element={<AdminCategories />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="appearance" element={<AdminAppearance />} />

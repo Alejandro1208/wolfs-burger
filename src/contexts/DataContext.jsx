@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const DataContext = createContext();
 const BASE_API_URL = "https://alejandrosabater.com.ar/api";
-
+//const BASE_API_URL = 'http://localhost/api';
 export const useData = () => {
     const context = useContext(DataContext);
     if (!context) throw new Error("useData must be used within a DataProvider");

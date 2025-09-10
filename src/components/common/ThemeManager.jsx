@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useData } from '../../contexts/DataContext';
 
 const hexToRgb = (hex) => {
@@ -11,19 +11,15 @@ const ThemeManager = () => {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (siteSettings.color_primary) {
-      root.style.setProperty('--color-primary', hexToRgb(siteSettings.color_primary));
-    }
-    if (siteSettings.color_secondary) {
-      root.style.setProperty('--color-secondary', hexToRgb(siteSettings.color_secondary));
-    }
-    if (siteSettings.color_accent) {
-      root.style.setProperty('--color-accent', hexToRgb(siteSettings.color_accent));
+    if (siteSettings) {
+      root.style.setProperty('--color-primary', hexToRgb(siteSettings.color_primary || '#0d1e3d'));
+      root.style.setProperty('--color-secondary', hexToRgb(siteSettings.color_secondary || '#226ea5'));
+      root.style.setProperty('--color-accent', hexToRgb(siteSettings.color_accent || '#e68e24'));
     }
     document.body.style.opacity = 1;
   }, [siteSettings]);
 
-  return null; // Este componente no renderiza nada
+  return null;
 };
 
 export default ThemeManager;
