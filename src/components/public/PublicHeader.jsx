@@ -10,7 +10,7 @@ const PublicHeader = () => {
 
   const navigation = [
     { name: 'Inicio', href: '/' },
-    { name: 'Menú', href: '/menu' },
+    { name: 'Productos', href: '/menu' },
   ];
 
   return (

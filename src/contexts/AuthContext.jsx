@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
-const BASE_API_URL = 'https://alejandrosabater.com.ar/api';
+const BASE_API_URL = "/web/api";
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

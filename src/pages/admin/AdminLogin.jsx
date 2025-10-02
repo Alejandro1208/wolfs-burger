@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    fetch('https://alejandrosabater.com.ar/api/settings.php')
+    fetch('/web/api/settings.php')
       .then(res => res.json())
       .then(settings => {
         if (settings.site_logo_url) {

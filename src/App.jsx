@@ -41,7 +41,7 @@ function App() {
     <AuthProvider>
       <DataProvider>
         <ThemeManager /> 
-        <Router>
+        <Router basename="/web">
           <FaviconManager />
           <Routes>
             <Route path="/" element={<PublicLayout />}>
